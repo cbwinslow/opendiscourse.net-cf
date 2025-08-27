@@ -295,3 +295,39 @@ docker-compose up -d
 10. **Voice Analysis** - Speaker identification and voice pattern analysis
 
 OpenDiscourse represents the future of political document analysis, combining the power of Cloudflare's edge computing with advanced AI techniques to provide unprecedented insights into political discourse.
+
+## Repository Setup
+
+To set up this repository on GitHub and GitLab:
+
+1. **Create repositories** on GitHub and GitLab (see GITHUB_SETUP.md and GITLAB_SETUP.md)
+2. **Run the setup script**:
+   ```bash
+   ./setup_remotes.sh
+   ```
+3. **Or manually add remotes**:
+   ```bash
+   git remote add origin https://github.com/your-username/your-repo.git
+   git remote add gitlab https://gitlab.com/your-username/your-repo.git
+   ```
+4. **Push to both repositories**:
+   ```bash
+   git push -u origin main
+   git push -u gitlab main
+   ```
+
+## Future Enhancements
+
+1. **User Authentication** - Add user accounts and access control
+2. **Advanced Visualization** - Interactive charts and graphs
+3. **Real-time Collaboration** - Multi-user document annotation
+4. **Mobile Application** - Native mobile apps for iOS and Android
+5. **Browser Extension** - Chrome extension for political research
+6. **API Integrations** - Connect to government data sources
+7. **Multilingual Support** - Support for multiple languages
+8. **Advanced RAG** - Multi-hop reasoning and complex query handling
+9. **crawl4ai-rag Integration** - Web crawling for enhanced data sources
+10. **Voice Analysis** - Speaker identification and voice pattern analysis
+11. **Cloudflare Containers** - Deploy Docker containers to Cloudflare Workers (June 2025)
+
+OpenDiscourse represents the future of political document analysis, combining the power of Cloudflare's edge computing with advanced AI techniques to provide unprecedented insights into political discourse.
