@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - OpenDiscourse</title>
+    <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>OpenDiscourse Dashboard</h1>
+            <p class="subtitle">Political Document Analysis Platform</p>
+        </header>
+
+        <div class="features">
+            <div class="feature-card">
+                <h3><span class="feature-icon">📊</span> Document Statistics</h3>
+                <p>Total Documents: <strong id="document-count">0</strong></p>
+                <p>Processed Today: <strong id="today-count">0</strong></p>
+            </div>
+            <div class="feature-card">
+                <h3><span class="feature-icon">👥</span> Entities Tracked</h3>
+                <p>Politicians: <strong id="politician-count">0</strong></p>
+                <p>Legislation: <strong id="legislation-count">0</strong></p>
+            </div>
+            <div class="feature-card">
+                <h3><span class="feature-icon">🔗</span> Relationships</h3>
+                <p>Total Relationships: <strong id="relationship-count">0</strong></p>
+                <p>New This Week: <strong id="week-count">0</strong></p>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h2>Recent Documents</h2>
+            <div id="recent-documents">
+                <p>Loading recent documents...</p>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h2>Knowledge Graph Visualization</h2>
+            <div id="graph-visualization" style="height: 400px; background: #f1f5f9; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
+                <p>Knowledge graph visualization will appear here</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>OpenDiscourse - Political Document Analyzer | Powered by Cloudflare</p>
+        </footer>
+    </div>
+
+    <script>
+        // Simple dashboard functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate loading data
+            setTimeout(function() {
+                document.getElementById('document-count').textContent = '1,247';
+                document.getElementById('today-count').textContent = '12';
+                document.getElementById('politician-count').textContent = '542';
+                document.getElementById('legislation-count').textContent = '893';
+                document.getElementById('relationship-count').textContent = '12,456';
+                document.getElementById('week-count').textContent = '243';
+                
+                document.getElementById('recent-documents').innerHTML = `
+                    <div class="endpoint">
+                        <strong>H.R. 1234 - Healthcare Reform Act</strong> - Introduced: 2023-06-15
+                    </div>
+                    <div class="endpoint">
+                        <strong>S. 567 - Infrastructure Investment</strong> - Introduced: 2023-06-12
+                    </div>
+                    <div class="endpoint">
+                        <strong>H.R. 890 - Education Enhancement</strong> - Introduced: 2023-06-10
+                    </div>
+                `;
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

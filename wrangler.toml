@@ -1,0 +1,28 @@
+name = "opendiscourse"
+main = "src/index.ts"
+compatibility_date = "2025-08-27"
+
+[triggers]
+crons = ["*/15 * * * *"]
+
+# D1 Database for structured data
+[[d1_databases]]
+binding = "DB"
+database_name = "opendiscourse-db"
+database_id = "opendiscourse-db-id"
+
+# KV Namespace for caching
+[[kv_namespaces]]
+binding = "CACHE"
+id = "opendiscourse-cache-id"
+
+# R2 Bucket for document storage
+[[r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "opendiscourse-documents"
+preview_bucket_name = "opendiscourse-documents-preview"
+
+# Vectorize for embeddings
+[[vectorize]]
+binding = "VECTOR_INDEX"
+index_name = "opendiscourse-vector-index"

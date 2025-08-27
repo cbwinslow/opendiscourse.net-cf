@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenDiscourse - Political Document Analyzer</title>
+    <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>OpenDiscourse</h1>
+            <p class="subtitle">AI-Powered Political Document Analysis Platform</p>
+        </header>
+
+        <div class="features">
+            <div class="feature-card">
+                <h3><span class="feature-icon">📄</span> Document Management</h3>
+                <p>Upload, store, and organize political documents with automatic metadata extraction.</p>
+            </div>
+            <div class="feature-card">
+                <h3><span class="feature-icon">🔍</span> Advanced Search</h3>
+                <p>Full-text and semantic search across all documents with powerful filtering options.</p>
+            </div>
+            <div class="feature-card">
+                <h3><span class="feature-icon">🤖</span> AI Analysis</h3>
+                <p>NLP-powered analysis including sentiment, entity extraction, and topic modeling.</p>
+            </div>
+            <div class="feature-card">
+                <h3><span class="feature-icon">🧠</span> Knowledge Graph</h3>
+                <p>Entity relationship mapping and political network visualization.</p>
+            </div>
+            <div class="feature-card">
+                <h3><span class="feature-icon">💬</span> RAG Question Answering</h3>
+                <p>Ask questions about political documents with context-aware answers and citations.</p>
+            </div>
+            <div class="feature-card">
+                <h3><span class="feature-icon">📊</span> Visualization</h3>
+                <p>Interactive dashboards and reports for political trend analysis and comparisons.</p>
+            </div>
+        </div>
+
+        <div class="cta-section">
+            <h2>Get Started with OpenDiscourse</h2>
+            <p>Upload your first political document and unlock powerful AI insights</p>
+            <a href="/api/health" class="btn">Check System Status</a>
+            <a href="https://github.com/your-org/opendiscourse" class="btn btn-outline">View Documentation</a>
+        </div>
+
+        <div class="api-section">
+            <h2>API Endpoints</h2>
+            <div class="endpoint">
+                <span class="endpoint-method post">POST</span>
+                <strong>/api/documents</strong> - Upload a political document
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-method get">GET</span>
+                <strong>/api/search?q={query}</strong> - Search documents
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-method post">POST</span>
+                <strong>/api/analyze</strong> - Analyze document content
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-method post">POST</span>
+                <strong>/api/rag/query</strong> - Ask questions about documents
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-method post">POST</span>
+                <strong>/api/graph/query</strong> - Query the knowledge graph
+            </div>
+        </div>
+
+        <footer>
+            <p>OpenDiscourse - Political Document Analyzer | Powered by Cloudflare</p>
+        </footer>
+    </div>
+</body>
+</html>

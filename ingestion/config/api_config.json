@@ -1,0 +1,58 @@
+{
+  "govinfo": {
+    "apiBaseUrl": "https://api.govinfo.gov",
+    "apiKey": "YOUR_API_KEY_HERE",
+    "bulkDataUrl": "https://www.govinfo.gov/bulkdata",
+    "collections": [
+      "BILLS",
+      "CRPT",
+      "CREC",
+      "FR",
+      "GAO",
+      "GOVMAN",
+      "HMAN",
+      "HOMELAND_SECURITY",
+      "ERIC",
+      "BUDGET",
+      "CPD",
+      "CPRT",
+      "CHRG",
+      "CQ",
+      "CQAL",
+      "LSA",
+      "PLAW",
+      "STATUTE",
+      "USCODE",
+      "USCOURTS"
+    ]
+  },
+  "congress": {
+    "apiBaseUrl": "https://api.congress.gov/v3",
+    "apiKey": "YOUR_API_KEY_HERE"
+  },
+  "cloudflare": {
+    "accountId": "YOUR_ACCOUNT_ID",
+    "vectorizeIndex": "opendiscourse-vector-index",
+    "r2Bucket": "opendiscourse-documents",
+    "d1Database": "opendiscourse-db"
+  },
+  "ingestion": {
+    "chunkSize": 1000,
+    "batchSize": 50,
+    "maxRetries": 3,
+    "retryDelay": 1000,
+    "concurrentDownloads": 5
+  },
+  "parsers": {
+    "pdf": {
+      "maxPages": 1000,
+      "extractImages": false
+    },
+    "xml": {
+      "preserveFormatting": true
+    },
+    "html": {
+      "extractTextOnly": true
+    }
+  }
+}

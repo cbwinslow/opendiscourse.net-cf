@@ -1,0 +1,27 @@
+{
+  "name": "opendiscourse-agentic-graph",
+  "version": "1.0.0",
+  "description": "Agentic knowledge graph system for political document analysis",
+  "main": "orchestrator.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "start": "node dist/orchestrator.js"
+  },
+  "keywords": [
+    "political-analysis",
+    "knowledge-graph",
+    "nlp",
+    "neo4j",
+    "bert"
+  ],
+  "author": "OpenDiscourse Team",
+  "license": "MIT",
+  "dependencies": {
+    "neo4j-driver": "^5.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  }
+}

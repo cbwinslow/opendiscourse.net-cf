@@ -1,0 +1,40 @@
+{
+  "neo4j": {
+    "uri": "bolt://localhost:7687",
+    "username": "neo4j",
+    "password": "password",
+    "database": "opendiscourse",
+    "useAura": false,
+    "auraUri": "neo4j+s://your-instance-id.databases.neo4j.io",
+    "auraUsername": "neo4j",
+    "auraPassword": "your-password"
+  },
+  "graphSchema": {
+    "entities": [
+      "Politician",
+      "Legislation",
+      "Organization",
+      "GovernmentBody",
+      "Vote",
+      "Action",
+      "Statement",
+      "MediaAppearance",
+      "SocialMediaPost"
+    ],
+    "relationships": [
+      "MEMBER_OF",
+      "SPONSORS",
+      "VOTES_ON",
+      "AUTHORS",
+      "MENTIONS",
+      "AFFILIATED_WITH",
+      "OPPOSES",
+      "SUPPORTS",
+      "DECLARED_IN",
+      "AFFECTS",
+      "RESPONDS_TO",
+      "QUOTES",
+      "REFERENCES"
+    ]
+  }
+}

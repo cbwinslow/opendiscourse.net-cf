@@ -1,0 +1,4 @@
+# Cloudflare Pages Configuration
+
+name = "opendiscourse-frontend"
+compatibility_date = "2025-08-27"

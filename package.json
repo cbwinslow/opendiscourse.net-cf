@@ -1,0 +1,23 @@
+{
+  "name": "opendiscourse",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "start": "wrangler dev",
+    "logs": "wrangler tail",
+    "migrate": "wrangler d1 migrations apply opendiscourse-db",
+    "ingest:govinfo": "npx ts-node ingestion/scripts/ingestion.ts govinfo",
+    "ingest:congress": "npx ts-node ingestion/scripts/ingestion.ts congress",
+    "ingest:all": "npx ts-node ingestion/scripts/ingestion.ts all",
+    "test:ingestion": "npx ts-node ingestion/scripts/test_ingestion.ts"
+  },
+  "devDependencies": {
+    "wrangler": "^3.93.0",
+    "typescript": "^5.5.4",
+    "@cloudflare/workers-types": "^4.20250824.0",
+    "ts-node": "^10.9.1",
+    "@types/node": "^20.11.24"
+  }
+}
