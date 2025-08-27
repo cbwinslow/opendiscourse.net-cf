@@ -27,6 +27,7 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 - Context-aware responses with citations
 - Multi-document synthesis and comparison
 - Fact-checking against known political statements
+- AutoRAG database for semantic search and question answering
 
 ### Visualization & Reporting
 - Interactive dashboards for political analysis
@@ -35,10 +36,11 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 - Exportable reports and visualizations
 
 ### Data Ingestion
-- Automated ingestion from govinfo.gov and congress.gov
+- Automated ingestion from govinfo.gov (API and bulkdata)
 - Support for multiple document formats (PDF, XML, HTML, Markdown, TXT)
 - Webhook system for real-time updates
 - Chunking and vectorization for semantic search
+- AutoRAG database for govinfo.gov/bulkdata processing (recommended approach)
 
 ### Agentic Knowledge Graph
 - Entity and relationship extraction using BERT-based NER
@@ -64,6 +66,12 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 3. **Agent Architecture** - Coordinated analysis pipeline
 4. **Inference Engine** - Relationship discovery
 
+### AutoRAG Database System
+1. **Vectorize** - Vector database for semantic search
+2. **D1** - Structured data storage for document metadata
+3. **R2** - Object storage for original documents
+4. **Workers AI** - Embedding generation and processing
+
 ## API Endpoints
 
 ### Documents
@@ -84,6 +92,10 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 - `POST /api/rag/query` - Ask questions about documents
 - `POST /api/rag/compare` - Compare multiple documents
 
+### AutoRAG
+- `POST /api/rag/search` - Semantic search in document corpus
+- `POST /api/rag/context` - Assemble context for a query
+
 ### Knowledge Graph
 - `POST /api/graph/query` - Query the knowledge graph
 - `GET /api/graph/entities/{id}` - Get entity details
@@ -98,6 +110,7 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 - Node.js
 - Cloudflare account
 - Wrangler CLI
+- API keys for govinfo.gov and congress.gov (see `autorag/API_CONFIGURATION_GUIDE.md`)
 
 ### Setup
 1. Install dependencies:
@@ -110,7 +123,19 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
    wrangler login
    ```
 
-3. Create required resources:
+3. Obtain API keys:
+   - For govinfo.gov: Visit https://api.govinfo.gov/signup/
+   - For congress.gov: Visit https://congress.gov/api/Documentation
+   - See `autorag/API_CONFIGURATION_GUIDE.md` for detailed instructions
+
+4. Configure API keys:
+   ```bash
+   cp ingestion/config/api_config.json.example ingestion/config/api_config.json
+   # Edit the file with your real API keys
+   nano ingestion/config/api_config.json
+   ```
+
+5. Create required Cloudflare resources:
    ```bash
    # Create D1 database
    wrangler d1 create opendiscourse-db
@@ -122,12 +147,12 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
    wrangler kv:namespace create "opendiscourse-cache"
    
    # Create Vectorize index
-   wrangler vectorize create opendiscourse-vector-index --preset @cf/baai/bge-small-en-v1.5
+   wrangler vectorize create opendiscourse-vector-index --dimensions 1024 --metric cosine
    ```
 
-4. Update `wrangler.toml` with the actual IDs returned from the previous commands.
+6. Update `wrangler.toml` with the actual IDs returned from the previous commands.
 
-5. Apply database migrations:
+7. Apply database migrations:
    ```bash
    npm run migrate
    ```
@@ -155,6 +180,9 @@ The project includes a comprehensive data ingestion system for government data:
 ```bash
 # Ingest govinfo.gov data
 npm run ingest:govinfo
+
+# Ingest govinfo.gov bulkdata
+npm run ingest:bulkdata
 
 # Ingest congress.gov data
 npm run ingest:congress
@@ -243,6 +271,11 @@ docker-compose up -d
 │   ├── scripts/              # Ingestion scripts
 │   ├── config/               # Configuration files
 │   └── README.md             # Ingestion system documentation
+├── autorag/                  # AutoRAG database system
+│   ├── AUTORAG_README.md     # AutoRAG documentation
+│   ├── AUTORAG_SETUP_GUIDE.md # Setup guide
+│   ├── AUTORAG_SETUP_PLAN.md # Implementation plan
+│   └── AUTORAG_IMPLEMENTATION_SUMMARY.md # Implementation summary
 ├── agentic_graph/            # Agentic knowledge graph system
 │   ├── agents/               # Agent implementations
 │   ├── models/               # NLP models

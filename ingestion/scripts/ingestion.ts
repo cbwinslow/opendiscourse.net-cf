@@ -4,6 +4,7 @@
 // This script orchestrates the entire data ingestion process
 
 import { GovInfoIngestion } from '../govinfo/govinfo_ingestion';
+import { GovInfoBulkDataProcessor } from '../govinfo/govinfo_bulkdata_processor';
 import { CongressIngestion } from '../congress/congress_ingestion';
 import { GenericFileParser } from '../generic_parsers/file_parser';
 import { VectorizationService } from '../tools/vectorization_service';
@@ -16,6 +17,7 @@ const congressConfig = config.congress;
 
 // Initialize services
 const govinfoIngestion = new GovInfoIngestion(govinfoConfig);
+const govinfoBulkDataProcessor = new GovInfoBulkDataProcessor(config);
 const congressIngestion = new CongressIngestion(congressConfig);
 const vectorizationService = new VectorizationService(config.ingestion.chunkSize);
 // Database service would be initialized with D1 database in Cloudflare environment
@@ -29,6 +31,21 @@ async function ingestGovInfoData() {
     console.log("Finished govinfo.gov data ingestion");
   } catch (error) {
     console.error("Error during govinfo.gov data ingestion:", error);
+  }
+}
+
+async function ingestGovInfoBulkData() {
+  console.log("Starting govinfo.gov bulkdata ingestion...");
+  
+  try {
+    // Process bulkdata for all collections
+    const bulkConfig = config.autorag?.bulkDataProcessing || {};
+    const limitPerCollection = bulkConfig.maxPackagesPerCollection || 100;
+    
+    await govinfoBulkDataProcessor.processAllCollectionsBulkData(limitPerCollection);
+    console.log("Finished govinfo.gov bulkdata ingestion");
+  } catch (error) {
+    console.error("Error during govinfo.gov bulkdata ingestion:", error);
   }
 }
 
@@ -86,7 +103,7 @@ async function main() {
   
   if (args.length === 0) {
     console.log("No arguments provided. Running default ingestion process.");
-    console.log("Usage: node ingestion.js [govinfo|congress|file <path>]");
+    console.log("Usage: node ingestion.js [govinfo|congress|bulkdata|file <path>|all]");
     return;
   }
   
@@ -95,6 +112,10 @@ async function main() {
   switch (command) {
     case 'govinfo':
       await ingestGovInfoData();
+      break;
+      
+    case 'bulkdata':
+      await ingestGovInfoBulkData();
       break;
       
     case 'congress':
@@ -111,12 +132,13 @@ async function main() {
       
     case 'all':
       await ingestGovInfoData();
+      await ingestGovInfoBulkData();
       await ingestCongressData();
       break;
       
     default:
       console.error(`Unknown command: ${command}`);
-      console.log("Usage: node ingestion.js [govinfo|congress|file <path>|all]");
+      console.log("Usage: node ingestion.js [govinfo|congress|bulkdata|file <path>|all]");
   }
   
   console.log("Data ingestion process completed.");

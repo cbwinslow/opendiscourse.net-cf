@@ -1,0 +1,39 @@
+{
+  "memberId": "S001234",
+  "firstName": "Alex",
+  "lastName": "Johnson",
+  "fullName": "Alex Johnson",
+  "state": "CA",
+  "party": "D",
+  "chamber": "House",
+  "district": 12,
+  "startDate": "2023-01-03",
+  "endDate": null,
+  "phone": "(202) 225-1234",
+  "fax": "(202) 225-5678",
+  "website": "https://johnson.house.gov",
+  "committees": [
+    {
+      "committeeId": "HSBA",
+      "name": "House Committee on Financial Services",
+      "rank": 3,
+      "party": "D"
+    },
+    {
+      "committeeId": "HSGO",
+      "name": "House Committee on Oversight and Accountability",
+      "rank": 7,
+      "party": "D"
+    }
+  ],
+  "hearings": [
+    {
+      "hearingId": "HHRG-118-HSBA00-20250315",
+      "committeeId": "HSBA",
+      "date": "2025-03-15",
+      "time": "10:00",
+      "location": "2128 Rayburn House Office Building",
+      "title": "Oversight of the Federal Reserve System"
+    }
+  ]
+}

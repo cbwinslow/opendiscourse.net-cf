@@ -1,7 +1,7 @@
 {
   "govinfo": {
     "apiBaseUrl": "https://api.govinfo.gov",
-    "apiKey": "JRiK258tD1yRUWSnaeI2vUchbbjzyaZGoQT7LWfG",
+    "apiKey": "YOUR_REAL_GOVINFO_API_KEY_HERE",
     "bulkDataUrl": "https://www.govinfo.gov/bulkdata",
     "collections": [
       "BILLS",
@@ -28,10 +28,10 @@
   },
   "congress": {
     "apiBaseUrl": "https://api.congress.gov/v3",
-    "apiKey": "nt7MSte5iCSAphsEVqv10WdjdNU0a7QHCfEagcFj"
+    "apiKey": "YOUR_REAL_CONGRESS_API_KEY_HERE"
   },
   "cloudflare": {
-    "accountId": "968ff4ee9f5e59bc6c72758269d6b9d6",
+    "accountId": "YOUR_CLOUDFLARE_ACCOUNT_ID",
     "vectorizeIndex": "opendiscourse-vector-index",
     "r2Bucket": "opendiscourse-documents",
     "d1Database": "opendiscourse-db"

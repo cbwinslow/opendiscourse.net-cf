@@ -1,6 +1,7 @@
 name = "opendiscourse"
 main = "src/index.ts"
 compatibility_date = "2025-08-27"
+account_id = "968ff4ee9f5e59bc6c72758269d6b9d6"
 
 [triggers]
 crons = ["*/15 * * * *"]

@@ -1,0 +1,83 @@
+{
+  "congress": 118,
+  "type": "hr",
+  "number": 1234,
+  "title": "American Data Privacy Act of 2025",
+  "introducedDate": "2025-03-15",
+  "sponsor": {
+    "title": "Rep.",
+    "name": "Jane Smith",
+    "state": "CA",
+    "party": "D"
+  },
+  "cosponsorsCount": 42,
+  "committees": ["Energy and Commerce", "Judiciary"],
+  "latestAction": {
+    "actionDate": "2025-04-02",
+    "text": "Ordered to be Reported by the Yeas and Nays: 21 - 15."
+  },
+  "subjects": [
+    {"name": "Administrative law and regulatory procedures"},
+    {"name": "Civil actions and liability"},
+    {"name": "Computer security and identity theft"},
+    {"name": "Consumer affairs"},
+    {"name": "Data privacy and security"},
+    {"name": "Federal Trade Commission (FTC)"},
+    {"name": "Government information and archives"},
+    {"name": "Internet and video services"},
+    {"name": "Right of privacy"},
+    {"name": "State and local courts"}
+  ],
+  "summaries": [
+    {
+      "version": "Introduced in House",
+      "actionDate": "2025-03-15",
+      "actionDesc": "Introduced in House",
+      "text": "This bill establishes a comprehensive consumer data privacy framework. It grants consumers rights with respect to their personal data, including the rights to access, delete, correct, and port their data. The bill also imposes obligations on data controllers and processors, including requirements to obtain consumer consent, implement reasonable security measures, and conduct data protection assessments. Civil penalties for violations range from $2,500 to $7,500 per violation. Consumers may bring civil actions against data controllers for certain violations."
+    }
+  ],
+  "actions": [
+    {
+      "actionDate": "2025-03-15",
+      "actionType": "Intro-H",
+      "actionName": "Introduced in House",
+      "actionStage": "Intro",
+      "text": "Introduced in House"
+    },
+    {
+      "actionDate": "2025-03-16",
+      "actionType": "BecameLaw",
+      "actionName": "Referred to Committee",
+      "actionStage": "Committee",
+      "text": "Referred to the House Energy and Commerce Committee and in addition to the Committees on the Judiciary, Ways and Means, and Financial Services for a period to be subsequently determined by the Speaker, in each case for consideration of such provisions as fall within the jurisdiction of the committee concerned."
+    },
+    {
+      "actionDate": "2025-04-01",
+      "actionType": "Markup",
+      "actionName": "Markup by Committee",
+      "actionStage": "Committee",
+      "text": "Committee Consideration and Mark-up Session Held"
+    },
+    {
+      "actionDate": "2025-04-02",
+      "actionType": "ReportedToHouse",
+      "actionName": "Ordered to be Reported",
+      "actionStage": "Committee",
+      "text": "Ordered to be Reported by the Yeas and Nays: 21 - 15."
+    }
+  ],
+  "cosponsors": [
+    {
+      "name": "John Johnson",
+      "state": "NY",
+      "party": "D",
+      "date": "2025-03-18"
+    },
+    {
+      "name": "Sarah Williams",
+      "state": "TX",
+      "party": "R",
+      "date": "2025-03-22"
+    }
+  ]
+}

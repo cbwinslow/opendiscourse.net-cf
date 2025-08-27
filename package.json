@@ -8,7 +8,11 @@
     "start": "wrangler dev",
     "logs": "wrangler tail",
     "migrate": "wrangler d1 migrations apply opendiscourse-db",
+    "setup:vectorize": "npx ts-node scripts/setup_vectorize.ts",
+    "test:config": "npx ts-node scripts/verify_api_config.ts",
+    "test:bulkdata": "npx ts-node scripts/test_bulkdata_access.ts",
     "ingest:govinfo": "npx ts-node ingestion/scripts/ingestion.ts govinfo",
+    "ingest:bulkdata": "npx ts-node ingestion/scripts/ingestion.ts bulkdata",
     "ingest:congress": "npx ts-node ingestion/scripts/ingestion.ts congress",
     "ingest:all": "npx ts-node ingestion/scripts/ingestion.ts all",
     "test:ingestion": "npx ts-node ingestion/scripts/test_ingestion.ts"
