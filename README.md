@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # OpenDiscourse: Political Document Analyzer
 
 OpenDiscourse is a comprehensive political document analysis platform built on Cloudflare's powerful suite of services. It leverages Workers, D1, R2, KV, Vectorize, and AI Gateway to provide advanced document management, search, analysis, and RAG (Retrieval Augmented Generation) capabilities.
@@ -364,3 +365,6 @@ To set up this repository on GitHub and GitLab:
 11. **Cloudflare Containers** - Deploy Docker containers to Cloudflare Workers (June 2025)
 
 OpenDiscourse represents the future of political document analysis, combining the power of Cloudflare's edge computing with advanced AI techniques to provide unprecedented insights into political discourse.
+=======
+# opendiscourse.net-cf
+>>>>>>> b328189aabbeda0eb157cb62df9c02295c81962a
