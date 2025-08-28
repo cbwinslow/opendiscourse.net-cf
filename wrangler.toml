@@ -1,10 +1,17 @@
 name = "opendiscourse"
 main = "src/index.ts"
-compatibility_date = "2025-08-27"
+compatibility_date = "2025-08-28"
+compatibility_flags = [ "nodejs_compat" ]
 account_id = "968ff4ee9f5e59bc6c72758269d6b9d6"
 
+# Main application
 [triggers]
 crons = ["*/15 * * * *"]
+
+# Environment variables
+[vars]
+NODE_ENV = "production"
+DOMAIN = "opendiscourse.net"
 
 # D1 Database for structured data
 [[d1_databases]]
@@ -12,18 +19,67 @@ binding = "DB"
 database_name = "opendiscourse-db"
 database_id = "opendiscourse-db-id"
 
-# KV Namespace for caching
+# D1 for analytics
+[[d1_databases]]
+binding = "ANALYTICS_DB"
+database_name = "opendiscourse-analytics"
+database_id = "opendiscourse-analytics-id"
+
+# KV Namespaces
 [[kv_namespaces]]
 binding = "CACHE"
 id = "opendiscourse-cache-id"
 
-# R2 Bucket for document storage
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "opendiscourse-sessions-id"
+
+# R2 Buckets
 [[r2_buckets]]
 binding = "DOCUMENTS"
 bucket_name = "opendiscourse-documents"
-preview_bucket_name = "opendiscourse-documents-preview"
+
+[[r2_buckets]]
+binding = "MODELS"
+bucket_name = "opendiscourse-models"
 
 # Vectorize for embeddings
 [[vectorize]]
 binding = "VECTOR_INDEX"
 index_name = "opendiscourse-vector-index"
+
+# Queues for background processing
+[[queues.producers]]
+queue = "background-tasks"
+binding = "BACKGROUND_QUEUE"
+
+[[queues.consumers]]
+queue = "background-tasks"
+max_batch_size = 10
+max_batch_timeout = 10
+
+# AI Configuration
+[ai]
+binding = "AI"
+
+# Pages configuration
+[build]
+command = "npm run build"
+publish = "dist"
+
+[build.upload]
+format = "modules"
+main = "./dist/worker.js"
+
+[build.upload.rules]
+type = "ESModule"
+glob = "**/*.js"
+
+# Environment overrides
+[env.production]
+name = "opendiscourse-prod"
+route = "opendiscourse.net/*"
+
+[env.staging]
+name = "opendiscourse-staging"
+route = "staging.opendiscourse.net/*"

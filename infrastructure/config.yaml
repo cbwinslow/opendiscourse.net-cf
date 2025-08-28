@@ -1,0 +1,163 @@
+# OpenDiscourse Infrastructure Configuration
+# Version: 1.0.0
+
+# Environment configuration
+environment: production
+region: us-east-1
+
+# Cloudflare configuration
+cloudflare:
+  account_id: ${CLOUDFLARE_ACCOUNT_ID}
+  api_token: ${CLOUDFLARE_API_TOKEN}
+  zone_id: ${CLOUDFLARE_ZONE_ID}
+  domain: opendiscourse.net
+
+# Database configuration
+databases:
+  postgres:
+    version: '15'
+    host: ${POSTGRES_HOST:-localhost}
+    port: ${POSTGRES_PORT:-5432}
+    database: ${POSTGRES_DB:-opendiscourse}
+    username: ${POSTGRES_USER:-postgres}
+    password: ${POSTGRES_PASSWORD}
+    extensions:
+      - pgvector
+      - pg_stat_statements
+      - pg_trgm
+
+  clickhouse:
+    version: '23.3'
+    host: ${CLICKHOUSE_HOST:-localhost}
+    port: ${CLICKHOUSE_PORT:-8123}
+    database: ${CLICKHOUSE_DB:-opendiscourse}
+    username: ${CLICKHOUSE_USER:-default}
+    password: ${CLICKHOUSE_PASSWORD}
+
+# Vector databases
+vector_databases:
+  pgvector:
+    enabled: true
+    dimensions: 1536
+    index_type: ivfflat
+    
+  weaviate:
+    enabled: true
+    host: ${WEAVIATE_HOST:-weaviate}
+    port: 8080
+    scheme: http
+    
+  qdrant:
+    enabled: true
+    host: ${QDRANT_HOST:-qdrant}
+    port: 6333
+    grpc_port: 6334
+
+# AI/ML Services
+ai_services:
+  openwebui:
+    enabled: true
+    image: ghcr.io/open-webui/open-webui:main
+    port: 3000
+    
+  localai:
+    enabled: true
+    image: localai/localai:latest
+    port: 8080
+    models:
+      - name: phi-3
+        url: https://huggingface.co/TheBloke/phi-3-mini-4k-instruct-GGUF/resolve/main/phi-3-mini-4k-instruct-q4.gguf
+      - name: gemma-2b
+        url: https://huggingface.co/TheBloke/gemma-2b-it-GGUF/resolve/main/gemma-2b-it.Q4_K_M.gguf
+
+  flowise:
+    enabled: true
+    image: flowiseai/flowise:latest
+    port: 3001
+    
+  n8n:
+    enabled: true
+    image: n8nio/n8n:latest
+    port: 5678
+
+# Monitoring Stack
+monitoring:
+  prometheus:
+    enabled: true
+    port: 9090
+    
+  grafana:
+    enabled: true
+    port: 3000
+    
+  loki:
+    enabled: true
+    port: 3100
+    
+  opensearch:
+    enabled: true
+    port: 9200
+    
+  graylog:
+    enabled: true
+    port: 9000
+    web_port: 12201
+    gelf_port: 12201
+
+# Message Broker
+message_broker:
+  rabbitmq:
+    enabled: true
+    port: 5672
+    management_port: 15672
+    default_user: ${RABBITMQ_DEFAULT_USER:-guest}
+    default_pass: ${RABBITMQ_DEFAULT_PASS:-guest}
+
+# API Gateway
+api_gateway:
+  kong:
+    enabled: true
+    port: 8000
+    admin_port: 8001
+    admin_gui_port: 8002
+    ssl_port: 8443
+
+# Authentication
+auth:
+  jwt:
+    secret: ${JWT_SECRET}
+    expires_in: 3600  # 1 hour
+    
+  oauth2:
+    enabled: true
+    providers:
+      - name: google
+        client_id: ${GOOGLE_CLIENT_ID}
+        client_secret: ${GOOGLE_CLIENT_SECRET}
+      - name: github
+        client_id: ${GITHUB_CLIENT_ID}
+        client_secret: ${GITHUB_CLIENT_SECRET}
+
+# Data Ingestion
+data_ingestion:
+  govinfo:
+    base_url: https://www.govinfo.gov/bulkdata
+    api_key: ${GOVINFO_API_KEY}
+    batch_size: 100
+    max_retries: 3
+    retry_delay: 5000  # ms
+    
+  cron_schedule: "0 0 * * *"  # Daily at midnight
+
+# Testing
+testing:
+  enabled: true
+  framework: jest
+  coverage_threshold: 80
+  e2e_timeout: 30000  # ms
+
+# Documentation
+documentation:
+  enabled: true
+  format: mkdocs
+  output_dir: ./docs
