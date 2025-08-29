@@ -1,0 +1,28 @@
+# Core dependencies
+langchain>=0.1.0
+langchain-community>=0.0.10
+langchain-core>=0.1.0
+chromadb>=0.4.0
+ollama>=0.1.5
+
+# Document processing
+pypdf>=3.17.0
+python-docx>=0.8.11
+unstructured>=0.10.0
+python-magic>=0.4.27
+
+# Data processing
+networkx>=3.0
+pyvis>=0.3.2
+pydantic>=2.0.0
+
+# Utilities
+python-dotenv>=1.0.0
+tqdm>=4.66.1
+requests>=2.31.0
+
+# Development
+types-requests>=2.31.0.1
+black>=23.0.0
+isort>=5.12.0
+mypy>=1.0.0

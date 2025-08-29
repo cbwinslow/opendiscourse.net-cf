@@ -1,0 +1,67 @@
+name: Deploy Cloudflare Worker
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'cloudflare-container-worker/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+
+jobs:
+  deploy:
+    name: Deploy Worker
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'staging' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      working-directory: ./cloudflare-container-worker
+      run: npm ci
+      
+    - name: Build worker
+      working-directory: ./cloudflare-container-worker
+      run: npm run build
+      
+    - name: Deploy to Cloudflare Workers
+      uses: cloudflare/wrangler-action@v3
+      with:
+        apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        command: deploy
+        environment: ${{ github.event.inputs.environment || 'staging' }}
+      
+    - name: Verify deployment
+      run: |
+        echo "Verifying Cloudflare Worker deployment..."
+        # Add actual verification steps here
+        
+  notify:
+    name: Notify Team
+    needs: deploy
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send deployment notification
+        uses: rtCamp/action-slack-notify@v2.2.0
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_TITLE: "Deployment ${{ job.status }}: Cloudflare Worker to ${{ github.event.inputs.environment || 'staging' }}"
+          SLACK_MESSAGE: "Deployment of Cloudflare Worker to ${{ github.event.inputs.environment || 'staging' }} ${{ (job.status == 'success' && 'succeeded') || 'failed' }}.\nCommit: ${{ github.sha }}"
+          SLACK_COLOR: ${{ (job.status == 'success' && '#36a64f') || '#ff0000' }}

@@ -1,0 +1,45 @@
+name: Deploy API Service
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'services/api/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+
+jobs:
+  deploy:
+    name: Deploy API
+    uses: ./.github/workflows/deploy-base.yml
+    with:
+      environment: ${{ github.event.inputs.environment || 'staging' }}
+      container_name: 'api-service'
+      dockerfile_path: 'services/api/Dockerfile'
+      build_context: 'services/api'
+      build_args: 'ENVIRONMENT=${{ github.event.inputs.environment || 'staging' }}'
+    secrets:
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      
+  notify:
+    name: Notify Team
+    needs: deploy
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send deployment notification
+        uses: rtCamp/action-slack-notify@v2.2.0
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_TITLE: "Deployment ${{ job.status }}: API Service to ${{ github.event.inputs.environment || 'staging' }}"
+          SLACK_MESSAGE: "Deployment of API Service to ${{ github.event.inputs.environment || 'staging' }} ${{ job.status == 'success' ? 'succeeded' : 'failed' }}.\nCommit: ${{ github.sha }}"
+          SLACK_COLOR: ${{ job.status == 'success' && '#36a64f' || '#ff0000' }}

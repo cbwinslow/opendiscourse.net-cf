@@ -1,0 +1,100 @@
+name: AI-Powered Repository Analysis
+
+on:
+  schedule:
+    # Run every day at 00:00 UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      analysis-type:
+        description: 'Type of analysis to run'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - code-analysis
+          - doc-ingestion
+          - knowledge-graph
+
+jobs:
+  analyze:
+    name: AI-Powered Analysis
+    runs-on: ubuntu-latest
+    
+    services:
+      ollama:
+        image: ollama/ollama:latest
+        ports:
+          - 11434:11434
+        options: >-
+          --health-cmd "ollama list"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y graphviz
+
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pyvis networkx python-dotenv langchain pydantic
+
+      - name: Set up Ollama
+        run: |
+          # Pull and set up the Ollama model
+          curl -fsSL https://ollama.com/install.sh | sh
+          ollama pull llama3
+          
+      - name: Run document ingestion
+        if: ${{ github.event.inputs.analysis-type == 'all' || github.event.inputs.analysis-type == 'doc-ingestion' }}
+        run: |
+          echo "Running document ingestion..."
+          python scripts/ingest_documents.py
+
+      - name: Run code analysis with Ollama
+        if: ${{ github.event.inputs.analysis-type == 'all' || github.event.inputs.analysis-type == 'code-analysis' }}
+        run: |
+          echo "Running code analysis..."
+          python scripts/analyze_codebase.py
+
+      - name: Update knowledge graph
+        if: ${{ github.event.inputs.analysis-type == 'all' || github.event.inputs.analysis-type == 'knowledge-graph' }}
+        run: |
+          echo "Updating knowledge graph..."
+          python scripts/update_knowledge_graph.py
+
+      - name: Generate analysis report
+        run: |
+          echo "Generating analysis report..."
+          python scripts/generate_report.py > analysis_report.md
+          
+      - name: Upload report
+        uses: actions/upload-artifact@v3
+        with:
+          name: ai-analysis-report
+          path: analysis_report.md
+          retention-days: 5
+          
+      - name: Notify completion
+        uses: rtCamp/action-slack-notify@v2.2.0
+        if: always()
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_TITLE: "AI Analysis ${{ job.status }}"
+          SLACK_MESSAGE: "AI-powered analysis ${{ job.status == 'success' && 'completed successfully' || 'failed' }}.\n[View Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+          SLACK_COLOR: ${{ job.status == 'success' && '#36a64f' || '#ff0000' }}

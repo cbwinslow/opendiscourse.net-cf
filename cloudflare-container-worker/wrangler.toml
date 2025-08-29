@@ -1,0 +1,14 @@
+name = "opendiscourse-container"
+main = "src/index.ts"
+compatibility_date = "2024-06-01"
+workers_dev = true
+
+[build]
+command = "npm run build"
+
+[build.upload]
+format = "modules"
+main = "./dist/index.js"
+
+# Environment variables
+NODE_ENV = "production"

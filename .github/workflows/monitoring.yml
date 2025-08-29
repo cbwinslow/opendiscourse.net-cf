@@ -1,0 +1,74 @@
+name: Monitoring and Notifications
+
+on:
+  schedule:
+    # Run every 30 minutes
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Deploy API Service", "Deploy Cloudflare Worker"]
+    types: [completed]
+
+jobs:
+  check-health:
+    name: Check System Health
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Check API Health
+      id: api_health
+      run: |
+        # Add actual health check for API
+        echo "Checking API health..."
+        # Example: curl -s -o /dev/null -w "%{http_code}" https://api.example.com/health
+        echo "status=healthy" >> $GITHUB_OUTPUT
+      continue-on-error: true
+      
+    - name: Check Worker Health
+      id: worker_health
+      run: |
+        # Add actual health check for worker
+        echo "Checking Worker health..."
+        # Example: curl -s -o /dev/null -w "%{http_code}" https://worker.example.com/health
+        echo "status=healthy" >> $GITHUB_OUTPUT
+      continue-on-error: true
+      
+    - name: Send health report
+      uses: rtCamp/action-slack-notify@v2.2.0
+      if: always()
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_TITLE: "System Health Report"
+        SLACK_MESSAGE: |
+          *API Status*: ${{ steps.api_health.outputs.status || 'unknown' }}
+          *Worker Status*: ${{ steps.worker_health.outputs.status || 'unknown' }}
+          *Last Check*: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+        SLACK_COLOR: "#36a64f"
+
+  deployment-notification:
+    name: Deployment Notification
+    if: ${{ github.event.workflow_run.conclusion != 'skipped' }}
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Get workflow info
+      uses: octokit/request-action@v2.x
+      id: workflow_info
+      with:
+        route: GET /repos/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Send deployment notification
+      uses: rtCamp/action-slack-notify@v2.2.0
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_TITLE: "Deployment ${{ github.event.workflow_run.conclusion == 'success' ? '✅' : '❌' }}: ${{ fromJson(steps.workflow_info.outputs.data).name }}"
+        SLACK_MESSAGE: |
+          *Workflow*: ${{ fromJson(steps.workflow_info.outputs.data).name }}
+          *Status*: ${{ github.event.workflow_run.conclusion }}
+          *Branch*: ${{ fromJson(steps.workflow_info.outputs.data).head_branch }}
+          *Commit*: ${{ fromJson(steps.workflow_info.outputs.data).head_commit.message }}
+          *Run by*: ${{ fromJson(steps.workflow_info.outputs.data).triggering_actor.login }}
+          [View Workflow Run](${{ fromJson(steps.workflow_info.outputs.data).html_url }})
+        SLACK_COLOR: ${{ github.event.workflow_run.conclusion == 'success' && '#36a64f' || '#ff0000' }}

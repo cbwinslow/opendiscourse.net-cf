@@ -1,12 +1,19 @@
 // Main API service for OpenDiscourse
+
+import { OpenAI } from "langchain/llms/openai";
+import { HNSWLib } from "langchain/vectorstores/hnswlib";
+import { OpenAIEmbeddings } from "langchain/embeddings/openai";
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
+import { loadQAStuffChain } from "langchain/chains";
+
 // Coordinates all services and handles API requests
 
 // Adjust import paths to be relative to the current file location
-import { DocumentService } from "../documents/document_processor";
-import { VectorService } from "../vector/vector_service";
-import { RagService } from "../rag/rag_service";
-import { SearchService } from "../search/search_service";
-import { AnalysisService } from "../analysis/analysis_service";
+import { DocumentService } from "../documents/document_processor.js";
+import { VectorService } from "../vector/vector_service.js";
+import { RagService } from "../rag/rag_service.js";
+import { SearchService } from "../search/search_service.js";
+import { AnalysisService } from "../analysis/analysis_service.js";
 
 interface Env {
   DB: D1Database;
@@ -16,6 +23,13 @@ interface Env {
 }
 
 export class OpenDiscourseAPI {
+  private static llm: OpenAI;
+  private static vectorStore: HNSWLib;
+
+  constructor() {
+    OpenDiscourseAPI.llm = new OpenAI({ temperature: 0.7 });
+  }
+
   static async handleRequest(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const path = url.pathname;
@@ -490,9 +504,16 @@ export class OpenDiscourseAPI {
     }
     
     // Simulate RAG response
+    const documentContent = "This is a sample political document for demonstration purposes.";
+    const chain = loadQAStuffChain(OpenDiscourseAPI.llm);
+    const answer = await chain.call({
+      question: question,
+      context: documentContent,
+    });
+
     const response = {
       question: question,
-      answer: "This is a simulated answer to your question about political documents. In a real implementation, this would use Retrieval Augmented Generation to provide accurate answers based on the content of political documents.",
+      answer: answer['text'],
       confidence: 0.95,
       citations: [
         {
@@ -503,7 +524,7 @@ export class OpenDiscourseAPI {
       ],
       created_at: new Date().toISOString()
     };
-    
+
     return new Response(JSON.stringify({
       success: true,
       response: response

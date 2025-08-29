@@ -1,0 +1,142 @@
+name: Test CI/CD Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      test-type:
+        description: 'Type of test to run'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+        - all
+        - build
+        - test
+        - security
+        - deploy
+
+jobs:
+  test-build:
+    name: Test Build Process
+    if: ${{ github.event.inputs.test-type == 'all' || github.event.inputs.test-type == 'build' }}
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: Build API Service
+      working-directory: ./services/api
+      run: |
+        pip install -r requirements.txt
+        # Add build command here
+        
+    - name: Build Cloudflare Worker
+      working-directory: ./cloudflare-container-worker
+      run: |
+        npm ci
+        npm run build
+        
+  test-unit-tests:
+    name: Run Unit Tests
+    needs: test-build
+    if: ${{ github.event.inputs.test-type == 'all' || github.event.inputs.test-type == 'test' }}
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        
+    - name: Run API Tests
+      working-directory: ./services/api
+      run: |
+        pip install -r requirements-test.txt
+        pytest
+        
+    - name: Run Worker Tests
+      working-directory: ./cloudflare-container-worker
+      run: |
+        npm ci
+        npm test
+        
+  test-security-scan:
+    name: Security Scan
+    needs: test-unit-tests
+    if: ${{ github.event.inputs.test-type == 'all' || github.event.inputs.test-type == 'security' }}
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Run Bandit (Python SAST)
+      uses: reviewdog/action-bandit@v1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        reporter: github-pr-review
+        
+    - name: Run ESLint
+      uses: reviewdog/action-eslint@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        reporter: github-pr-review
+        
+  test-deployment:
+    name: Test Deployment
+    needs: test-security-scan
+    if: ${{ github.event.inputs.test-type == 'all' || github.event.inputs.test-type == 'deploy' }}
+    runs-on: ubuntu-latest
+    environment: test
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Test API Deployment
+      uses: ./.github/workflows/deploy-api.yml
+      with:
+        environment: 'test'
+      secrets: inherit
+      
+    - name: Test Worker Deployment
+      uses: ./.github/workflows/deploy-worker.yml
+      with:
+        environment: 'test'
+      secrets: inherit
+      
+  report-results:
+    name: Report Test Results
+    needs: [test-build, test-unit-tests, test-security-scan, test-deployment]
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Generate Test Report
+      id: report
+      run: |
+        # Generate a simple test report
+        echo "# Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "## Build: ${{ needs.test-build.result || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+        echo "## Unit Tests: ${{ needs.test-unit-tests.result || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+        echo "## Security Scan: ${{ needs.test-security-scan.result || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+        echo "## Deployment Test: ${{ needs.test-deployment.result || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+        
+    - name: Send Notification
+      if: ${{ !cancelled() }}
+      uses: rtCamp/action-slack-notify@v2.2.0
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_TITLE: "Test Pipeline ${{ job.status }}"
+        SLACK_MESSAGE: "Test pipeline completed with status: ${{ job.status }}"
+        SLACK_COLOR: ${{ job.status == 'success' && 'good' || 'danger' }}

@@ -1,0 +1,83 @@
+name: Code Review Workflow
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  code-review:
+    name: Code Review Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
+    # Check for conventional commits
+    - name: Check commit messages
+      uses: wagoid/commitlint-github-action@v5
+      with:
+        configFile: .github/commitlint.config.js
+        
+    # Check PR title format
+    - name: Check PR Title
+      uses: amannn/action-semantic-pull-request@v5
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    # Check for large files
+    - name: Check for large files
+      uses: mheap/check-for-large-files@v2
+      with:
+        maxSize: 5
+        
+    # Check for merge conflicts
+    - name: Check for merge conflicts
+      uses: ezzatelsayed/check-conflicts-action@v1.1.1
+      
+    # Check for TODO comments
+    - name: Check for TODOs
+      uses: alstr/todo-to-issue-action@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        auto: true
+        
+    # Code owners review
+    - name: Check for required code owners
+      uses: amannn/action-require-codeowner-review@v1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        check_commits: true
+        
+    # Size labeler
+    - name: PR Size Labeler
+      uses: codelytv/pr-size-labeler@v1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        xs_max_size: '10'
+        s_max_size: '30'
+        m_max_size: '100'
+        l_max_size: '300'
+        
+    # Request review from team
+    - name: Request review from team
+      if: github.event_name == 'pull_request' && github.event.action == 'opened'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const { owner, repo, number } = context.issue;
+          await github.rest.pulls.requestReviewers({
+            owner,
+            repo,
+            pull_number: number,
+            team_reviewers: ['maintainers']
+          });
+          
+    # Auto-approve dependabot PRs
+    - name: Auto-approve dependabot PRs
+      if: github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]'
+      uses: hmarr/auto-approve-action@v3.0.0
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}

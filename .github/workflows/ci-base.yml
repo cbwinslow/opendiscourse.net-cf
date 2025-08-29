@@ -1,0 +1,76 @@
+name: CI Base Workflow
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  lint-and-test:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+    
+    services:
+      # Add any required services like databases here
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: Install dependencies
+      run: |
+        npm ci
+        pip install -r services/api/requirements.txt
+        
+    - name: Lint TypeScript
+      run: npx eslint '**/*.ts' --max-warnings=0
+      
+    - name: Lint Python
+      run: |
+        pip install black flake8
+        black --check services/api/
+        flake8 services/api/
+        
+    - name: Run TypeScript tests
+      run: npm test
+      env:
+        NODE_ENV: test
+        DATABASE_URL: postgresql://test:test@localhost:5432/test
+        
+    - name: Run Python tests
+      working-directory: services/api
+      run: |
+        pip install pytest pytest-cov
+        pytest --cov=. --cov-report=xml
+      env:
+        PYTHONPATH: ${{ github.workspace }}
+        
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: services/api/coverage.xml
+        fail_ci_if_error: true
