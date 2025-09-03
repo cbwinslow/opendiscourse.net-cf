@@ -43,37 +43,40 @@ graph TD
     C -->|Async Processing| I[Queues]
     I -->|Process| J[AI Services]
     J -->|Store Results| E & F & G
-    
+
     K[Monitoring] -->|Metrics| L[Prometheus]
     K -->|Logs| M[Cloudflare Logs]
     K -->|Traces| N[Cloudflare Trace Workers]
-    
+
     O[Admin] -->|Manage| P[Cloudflare Dashboard]
     O -->|Analyze| Q[Grafana]
 ```
 
 ## Service Dependencies
 
-| Service | Depends On | Description |
-|---------|------------|-------------|
-| Frontend | - | Static web application |
-| API Workers | D1, R2, KV, Vectorize | Core application logic |
-| Document Processor | R2, Queues | Handles document ingestion |
-| AI Services | Workers AI, Queues | Runs AI/ML models |
-| Monitoring | Prometheus, Grafana | Observability stack |
+| Service            | Depends On            | Description                |
+| ------------------ | --------------------- | -------------------------- |
+| Frontend           | -                     | Static web application     |
+| API Workers        | D1, R2, KV, Vectorize | Core application logic     |
+| Document Processor | R2, Queues            | Handles document ingestion |
+| AI Services        | Workers AI, Queues    | Runs AI/ML models          |
+| Monitoring         | Prometheus, Grafana   | Observability stack        |
 
 ## Scaling Considerations
 
 ### Horizontal Scaling
+
 - Workers automatically scale based on incoming requests
 - D1 supports read replicas for read-heavy workloads
 - R2 scales storage and bandwidth automatically
 
 ### Vertical Scaling
+
 - Worker CPU and memory can be increased via Cloudflare settings
 - D1 performance scales with the Cloudflare global network
 
 ### Performance Optimization
+
 - Edge caching with Cloudflare CDN
 - Intelligent routing to nearest data center
 - Automatic image optimization
@@ -81,11 +84,13 @@ graph TD
 ## Security Considerations
 
 ### Data Protection
+
 - All data encrypted at rest and in transit
 - Role-based access control (RBAC) for all services
 - Regular security audits and penetration testing
 
 ### Access Control
+
 - OAuth 2.0 and API key authentication
 - IP allowlisting for administrative access
 - Audit logging for all administrative actions
@@ -93,12 +98,14 @@ graph TD
 ## Monitoring and Alerting
 
 ### Metrics Collection
+
 - Request/response times
 - Error rates
 - Resource utilization
 - Custom business metrics
 
 ### Alerting
+
 - Real-time alerts for critical issues
 - Daily/weekly reports
 - On-call rotation for production incidents
@@ -106,11 +113,13 @@ graph TD
 ## Backup and Recovery
 
 ### Data Backup
+
 - Automated daily backups of D1 databases
 - Versioning enabled on R2 buckets
 - Point-in-time recovery for critical data
 
 ### Disaster Recovery
+
 - Multi-region failover configuration
 - Automated recovery procedures
 - Regular disaster recovery testing
@@ -118,11 +127,13 @@ graph TD
 ## Maintenance Procedures
 
 ### Regular Maintenance
+
 - Weekly system updates
 - Monthly security patches
 - Quarterly architecture reviews
 
 ### Upgrade Procedures
+
 1. Test in staging environment
 2. Create backup of production data
 3. Deploy changes during low-traffic periods
@@ -132,11 +143,13 @@ graph TD
 ## Cost Management
 
 ### Cost Optimization
+
 - Monitor resource utilization
 - Right-size services based on demand
 - Use reserved capacity for predictable workloads
 
 ### Budgeting
+
 - Monthly cost allocation by team
 - Alerting for unexpected cost increases
 - Regular cost optimization reviews
@@ -144,11 +157,13 @@ graph TD
 ## Compliance and Governance
 
 ### Regulatory Compliance
+
 - GDPR compliance for user data
 - Data retention policies
 - Audit logging for compliance requirements
 
 ### Change Management
+
 - All changes require code review
 - Deployment approvals for production
 - Rollback procedures for all deployments
@@ -156,6 +171,7 @@ graph TD
 ## Troubleshooting
 
 ### Common Issues
+
 1. **API Timeouts**
    - Check worker timeouts
    - Verify database connection limits
@@ -172,6 +188,7 @@ graph TD
    - Analyze query performance
 
 ### Support Channels
+
 - 24/7 on-call support for critical issues
 - Business hours support for non-critical issues
 - Community forum for questions and discussions
@@ -179,6 +196,7 @@ graph TD
 ## Contact Information
 
 For infrastructure support, contact:
+
 - **Email**: infrastructure@opendiscourse.net
 - **Slack**: #infra-support channel
 - **Emergency Pager**: +1-XXX-XXX-XXXX
@@ -186,11 +204,13 @@ For infrastructure support, contact:
 ## Changelog
 
 ### 2024-03-15
+
 - Initial infrastructure documentation
 - Added architecture diagrams
 - Documented deployment procedures
 
 ### 2024-03-10
+
 - Initial infrastructure setup
 - Basic monitoring configuration
 - CI/CD pipeline implementation

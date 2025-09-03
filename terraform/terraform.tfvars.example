@@ -1,0 +1,6 @@
+# Example terraform.tfvars
+# Copy to terraform.tfvars and fill in secure values (do not commit real tokens)
+
+cloudflare_api_token = "REPLACE_WITH_TOKEN"
+cloudflare_account_id = "REPLACE_WITH_ACCOUNT_ID"
+project_name = "opendiscourse"

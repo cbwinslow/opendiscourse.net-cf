@@ -1,9 +1,11 @@
 # Complete Git Repository Setup Guide
 
 ## Overview
+
 This guide explains how to upload the complete OpenDiscourse project to both GitHub and GitLab repositories.
 
 ## Prerequisites
+
 1. Git installed (already verified)
 2. GitHub account
 3. GitLab account
@@ -14,6 +16,7 @@ This guide explains how to upload the complete OpenDiscourse project to both Git
 ### 1. Create Repositories
 
 #### GitHub Repository Creation:
+
 1. Go to https://github.com and log in
 2. Click the "+" icon in the top right corner
 3. Select "New repository"
@@ -23,6 +26,7 @@ This guide explains how to upload the complete OpenDiscourse project to both Git
 7. Click "Create repository"
 
 #### GitLab Repository Creation:
+
 1. Go to https://gitlab.com and log in
 2. Click "New Project" button
 3. Select "Create blank project"
@@ -95,12 +99,14 @@ Both repositories will contain the complete OpenDiscourse project, including:
 ## Branch Strategy
 
 The repository uses a simple branch strategy:
+
 - `main` - Production-ready code
 - Feature branches - For development of new features (create as needed)
 
 ## Continuous Integration
 
 Consider setting up CI/CD pipelines on both platforms:
+
 - GitHub Actions for GitHub
 - GitLab CI/CD for GitLab
 
@@ -123,7 +129,7 @@ git pull gitlab main
 
 ### Common Issues
 
-1. **Authentication Failed**: 
+1. **Authentication Failed**:
    - Use personal access tokens instead of passwords
    - Configure Git credential helper
 
@@ -138,6 +144,7 @@ git pull gitlab main
 ### Support
 
 For additional help:
+
 1. Check Git documentation: https://git-scm.com/doc
 2. GitHub Help: https://help.github.com
 3. GitLab Help: https://docs.gitlab.com

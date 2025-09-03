@@ -7,16 +7,19 @@ We have successfully implemented the framework for configuring the AutoRAG syste
 ## What We've Done
 
 ### 1. API Integration Framework
+
 - Created configuration files that support govinfo.gov and congress.gov APIs
 - Implemented ingestion modules that can connect to these APIs
 - Built bulkdata processing capabilities for govinfo.gov/bulkdata
 
 ### 2. Configuration Management
+
 - Created `api_config.json.example` with proper structure
 - Updated the main configuration file with placeholder values
 - Added detailed documentation in `autorag/API_CONFIGURATION_GUIDE.md`
 
 ### 3. API-Specific Components
+
 - Enhanced `GovInfoIngestion` class to work with govinfo.gov API
 - Created `GovInfoBulkDataProcessor` for bulkdata processing
 - Configured API endpoints and authentication mechanisms
@@ -24,10 +27,12 @@ We have successfully implemented the framework for configuring the AutoRAG syste
 ## How to Configure for Real API Usage
 
 ### Step 1: Obtain API Keys
+
 1. **govinfo.gov**: Visit https://api.govinfo.gov/signup/
 2. **congress.gov**: Visit https://congress.gov/api/Documentation
 
 ### Step 2: Configure the System
+
 ```bash
 # Copy the example configuration
 cp ingestion/config/api_config.json.example ingestion/config/api_config.json
@@ -37,6 +42,7 @@ nano ingestion/config/api_config.json
 ```
 
 ### Step 3: Test Connectivity
+
 ```bash
 # Test govinfo API
 curl "https://api.govinfo.gov/collections/BILLS?offset=0&pageSize=1&api_key=YOUR_GOVINFO_API_KEY"
@@ -46,6 +52,7 @@ curl "https://api.congress.gov/v3/bill?api_key=YOUR_CONGRESS_API_KEY&limit=1"
 ```
 
 ### Step 4: Run Ingestion
+
 ```bash
 # Ingest from govinfo.gov
 npm run ingest:govinfo
@@ -63,6 +70,7 @@ npm run ingest:all
 ## API Endpoints Configured
 
 ### govinfo.gov API
+
 - Base URL: https://api.govinfo.gov
 - Collections endpoint: /collections/{collection}
 - Packages endpoint: /packages/{packageId}/summary
@@ -70,6 +78,7 @@ npm run ingest:all
 - Bulkdata URL: https://www.govinfo.gov/bulkdata
 
 ### congress.gov API
+
 - Base URL: https://api.congress.gov/v3
 - Bills endpoint: /bill
 - Members endpoint: /member
@@ -78,6 +87,7 @@ npm run ingest:all
 ## Verification
 
 The configuration framework has been verified:
+
 - ✅ All required files are present
 - ✅ Configuration structure is correct
 - ✅ API endpoints are properly defined

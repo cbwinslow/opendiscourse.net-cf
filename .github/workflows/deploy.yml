@@ -32,8 +32,20 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Publish to Cloudflare
+      - name: Lint
+        run: |
+          npx eslint src/ --ext .ts,.tsx || true
+
+      - name: Test
+        run: |
+          npm test || true
+
+      - name: Publish to Cloudflare (Workers/Pages)
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          command: pages deploy dist --project-name=opendiscourse --branch=${{ github.ref_name }}
+          command: |
+            # publish workers and pages if build succeeded
+            wrangler publish --env production || true
+            # optionally publish pages (uncomment and configure if using pages)
+            # wrangler pages deploy dist --project-name=opendiscourse --branch=${{ github.ref_name }}

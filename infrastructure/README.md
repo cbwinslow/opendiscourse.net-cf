@@ -31,12 +31,14 @@ infrastructure/
 ### 1. Initial Setup
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/yourusername/opendiscourse.net-cf.git
    cd opendiscourse.net-cf/infrastructure
    ```
 
 2. Run the setup script to generate configuration files and environment variables:
+
    ```bash
    chmod +x setup.sh
    ./setup.sh
@@ -53,6 +55,7 @@ docker-compose up -d
 ```
 
 This will start all the required services including:
+
 - PostgreSQL with pgvector
 - ClickHouse
 - Weaviate
@@ -65,6 +68,7 @@ This will start all the required services including:
 ### 3. Deploy to Cloudflare
 
 1. Ensure you're logged in to Cloudflare:
+
    ```bash
    wrangler login
    ```
@@ -76,6 +80,7 @@ This will start all the required services including:
    ```
 
 This will deploy:
+
 - Cloudflare Workers
 - D1 Databases
 - R2 Storage Buckets
@@ -162,12 +167,12 @@ graph TD
     D -->|Async Tasks| I[RabbitMQ]
     I -->|Process| J[Worker Services]
     J -->|Store| K[R2 Storage]
-    
+
     M[Monitoring] -->|Metrics| L[Prometheus]
     M -->|Logs| M1[Loki]
     M -->|Traces| M2[OpenSearch]
     M -->|Alerts| M3[AlertManager]
-    
+
     N[Admin] -->|Manage| O[Grafana]
     N -->|Query| P[Graylog]
     N -->|Orchestrate| Q[n8n]
@@ -184,11 +189,13 @@ graph TD
 ### Logs
 
 View logs for all services:
+
 ```bash
 docker-compose logs -f
 ```
 
 View logs for a specific service:
+
 ```bash
 docker-compose logs -f service_name
 ```

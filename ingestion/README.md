@@ -1,11 +1,13 @@
 # OpenDiscourse Data Ingestion System
 
 ## Overview
+
 This directory contains the data ingestion system for OpenDiscourse, designed to fetch, process, and store data from government sources including govinfo.gov and congress.gov.
 
 The system includes a bulk data ingestion pipeline for efficiently processing large datasets from GovInfo's bulk data repository.
 
 ## Directory Structure
+
 ```
 ingestion/
 ├── config/                 # Configuration files
@@ -20,6 +22,7 @@ ingestion/
 ## Setup
 
 1. **Install dependencies**:
+
    ```bash
    npm install
    ```
@@ -37,6 +40,7 @@ ingestion/
 
 ## Usage
 
+<<<<<<< HEAD
 ### Bulk Data Ingestion
 
 #### Process all available collections:
@@ -55,6 +59,10 @@ YEAR=2023 npm run bulkdata:ingest
 ```
 
 ### Standard API-based Ingestion
+=======
+### Ingest Data
+
+>>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
 ```bash
 # Ingest govinfo.gov data
 npm run ingest:govinfo
@@ -67,6 +75,7 @@ npm run ingest:all
 ```
 
 ### Process Individual Files
+
 The system can also process individual document files:
 
 ```bash
@@ -115,7 +124,9 @@ The bulk data ingestion system consists of the following main components:
 ## Components
 
 ### GovInfo Ingestion
+
 Fetches and processes data from govinfo.gov, including:
+
 - Legislative bills
 - Congressional records
 - Federal register documents
@@ -123,14 +134,18 @@ Fetches and processes data from govinfo.gov, including:
 - And more...
 
 ### Congress Ingestion
+
 Fetches and processes data from congress.gov, including:
+
 - Bills and resolutions
 - Members of Congress
 - Committees and subcommittees
 - Hearings and reports
 
 ### File Parsers
+
 Handles various document formats:
+
 - PDF documents
 - XML files
 - HTML web pages
@@ -138,39 +153,51 @@ Handles various document formats:
 - Plain text files
 
 ### Vectorization Service
+
 Chunks documents and prepares them for storage in vector databases:
+
 - Configurable chunk size and overlap
 - Metadata preservation
 - Embedding generation (simulated)
 
 ### Database Service
+
 Stores structured data in D1 database:
+
 - Normalized table schemas
 - Efficient indexing
 - Data deduplication
 
 ### Webhook Receiver
+
 Handles real-time data updates:
+
 - GovInfo.gov webhooks
 - Congress.gov webhooks
 - Custom webhook endpoints
 
 ## Configuration
+
 The system is configured through `config/api_config.json`:
+
 - API endpoints and keys
 - Chunking parameters
 - Processing limits
 - Retry policies
 
 ## Extending the System
+
 To add new data sources:
+
 1. Create a new ingestion module in a subdirectory
 2. Define the database schema in a migration file
 3. Implement the data fetching and processing logic
 4. Add the new source to the main ingestion script
 
 ## Integration with Cloudflare
+
 The ingestion system is designed to work with Cloudflare services:
+
 - **D1**: Structured data storage
 - **R2**: Document storage
 - **Vectorize**: Vector database for embeddings

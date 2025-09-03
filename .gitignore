@@ -143,3 +143,5 @@ logs/
 coverage/
 *.test.js
 *.spec.js
+# Sentry Config File
+.env.sentry-build-plugin

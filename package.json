@@ -38,6 +38,9 @@
     "docs:serve": "npx http-server docs -p 8080"
   },
   "dependencies": {
+    "@langchain/community": "^0.2.0",
+    "@langchain/openai": "^0.1.0",
+    "@sentry/nextjs": "^10.8.0",
     "@types/cheerio": "^0.22.35",
     "@types/jsdom": "^21.1.6",
     "@types/node": "^20.11.24",

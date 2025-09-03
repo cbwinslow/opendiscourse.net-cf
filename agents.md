@@ -14,7 +14,7 @@ This file catalogs the agents, scripts, and components added by this delivery.
     - Env or CLI for Postgres (PGHOST, PGPORT, PGDATABASE, PGUSER, PGPASSWORD).
     - Harvest parameters (--collection, --congress, --limit).
   - Outputs:
-    - Database schema and populated rows across mcp.*, staging.*, nlp.*, graph.*.
+    - Database schema and populated rows across mcp._, staging._, nlp._, graph._.
     - Console logs for steps/results and errors.
 
 - Database (Postgres + pgvector)
@@ -31,4 +31,5 @@ This file catalogs the agents, scripts, and components added by this delivery.
   - Notes: Intended as a thin control plane for local dev, not production-grade.
 
 Update cadence:
+
 - Update this file whenever you add or modify scripts, endpoints, services, or DB schema so future you doesn’t have to time-travel.

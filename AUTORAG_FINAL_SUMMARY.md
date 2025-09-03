@@ -36,6 +36,7 @@ We have successfully implemented an AutoRAG (Automated Retrieval-Augmented Gener
 ### Documentation
 
 All documentation is available in the `autorag/` directory:
+
 - `AUTORAG_README.md` - Main documentation
 - `AUTORAG_SETUP_GUIDE.md` - Deployment guide
 - `AUTORAG_SETUP_PLAN.md` - Implementation plan
@@ -44,6 +45,7 @@ All documentation is available in the `autorag/` directory:
 ## Verification
 
 The implementation has been verified with our verification script, which confirmed:
+
 - ✅ All required files are present
 - ✅ Package.json scripts are properly configured
 - ✅ Configuration files are updated

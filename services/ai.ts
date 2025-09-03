@@ -1,4 +1,4 @@
-import { getAIConfig } from '../config/ai';
+import { getAIConfig } from "../config/ai";
 
 type AITextGenerationOptions = {
   prompt: string;
@@ -22,7 +22,7 @@ type AIImageGenerationOptions = {
 type AITranscriptionOptions = {
   audio: ArrayBuffer;
   model?: string;
-  responseFormat?: 'json' | 'text' | 'srt' | 'vtt';
+  responseFormat?: "json" | "text" | "srt" | "vtt";
 };
 
 export class AIService {
@@ -37,7 +37,7 @@ export class AIService {
   constructor(env: any = {}) {
     this.config = getAIConfig(env);
     this.ai = env.AI; // Cloudflare AI binding
-    
+
     // Initialize rate limiting
     this.rateLimit = {
       queue: [],
@@ -48,7 +48,7 @@ export class AIService {
 
   private async rateLimitedCall<T>(fn: () => Promise<T>): Promise<T> {
     const now = Date.now();
-    
+
     // Reset counter if more than a minute has passed
     if (now - this.rateLimit.lastRequest > 60000) {
       this.rateLimit.requestsInMinute = 0;
@@ -56,9 +56,12 @@ export class AIService {
     }
 
     // If we've hit the rate limit, wait until we can make another request
-    if (this.rateLimit.requestsInMinute >= this.config.rateLimiting.requestsPerMinute) {
+    if (
+      this.rateLimit.requestsInMinute >=
+      this.config.rateLimiting.requestsPerMinute
+    ) {
       const waitTime = 60000 - (now - this.rateLimit.lastRequest);
-      await new Promise(resolve => setTimeout(resolve, waitTime));
+      await new Promise((resolve) => setTimeout(resolve, waitTime));
       this.rateLimit.requestsInMinute = 0;
       this.rateLimit.lastRequest = Date.now();
     }
@@ -79,10 +82,10 @@ export class AIService {
         prompt,
         max_tokens: maxTokens,
         temperature,
-      })
+      }),
     );
 
-    return response?.response || '';
+    return response?.response || "";
   }
 
   async generateEmbedding(options: AIEmbeddingOptions): Promise<number[][]> {
@@ -94,7 +97,7 @@ export class AIService {
     const response = await this.rateLimitedCall(() =>
       this.ai.run(model, {
         text: input,
-      })
+      }),
     );
 
     return Array.isArray(input) ? response.data : [response.data[0]];
@@ -113,7 +116,7 @@ export class AIService {
         num_steps: steps,
         width,
         height,
-      })
+      }),
     );
 
     return response;
@@ -131,7 +134,7 @@ export class AIService {
         audio: [...new Uint8Array(audio)],
         model: model,
         response_format: responseFormat,
-      })
+      }),
     );
 
     return response;
@@ -141,21 +144,23 @@ export class AIService {
   async batchProcess<T, R>(
     items: T[],
     processFn: (item: T) => Promise<R>,
-    batchSize: number = this.config.rateLimiting.maxConcurrent
+    batchSize: number = this.config.rateLimiting.maxConcurrent,
   ): Promise<R[]> {
     const results: R[] = [];
-    
+
     for (let i = 0; i < items.length; i += batchSize) {
       const batch = items.slice(i, i + batchSize);
-      const batchResults = await Promise.all(batch.map(item => processFn(item)));
+      const batchResults = await Promise.all(
+        batch.map((item) => processFn(item)),
+      );
       results.push(...batchResults);
-      
+
       // Add a small delay between batches
       if (i + batchSize < items.length) {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
     }
-    
+
     return results;
   }
 }

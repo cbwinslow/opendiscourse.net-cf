@@ -34,6 +34,7 @@ The OpenDiscourse AutoRAG project has been successfully uploaded to both reposit
 ## Repository Contents
 
 The repositories contain the complete AutoRAG implementation including:
+
 - Integration with govinfo.gov and congress.gov APIs
 - Cloudflare Workers, D1, R2, KV, and Vectorize
 - Semantic search and RAG question-answering capabilities
@@ -43,6 +44,7 @@ The repositories contain the complete AutoRAG implementation including:
 ## Commands for Future Updates
 
 To push future changes to both repositories:
+
 ```bash
 # Push to GitHub
 git push origin main
@@ -52,6 +54,7 @@ git push gitlab main
 ```
 
 Or use the provided script:
+
 ```bash
 ./push_to_remotes.sh
 ```

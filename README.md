@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+
+>>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
 # OpenDiscourse: Political Document Analyzer
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -238,6 +243,7 @@ Entities are automatically extracted during document ingestion. You can also man
 ## Technical Architecture
 
 ### Cloudflare Services Used
+
 1. **Workers** - Core application logic and API endpoints
 2. **D1** - Structured data storage (documents metadata, user data)
 3. **R2** - Object storage for original documents
@@ -247,12 +253,14 @@ Entities are automatically extracted during document ingestion. You can also man
 7. **Pages** - Frontend hosting
 
 ### Agentic Knowledge Graph System
+
 1. **Neo4j** - Graph database for entity relationships
 2. **BERT-based Models** - Entity extraction and analysis
 3. **Agent Architecture** - Coordinated analysis pipeline
 4. **Inference Engine** - Relationship discovery
 
 ### AutoRAG Database System
+
 1. **Vectorize** - Vector database for semantic search
 2. **D1** - Structured data storage for document metadata
 3. **R2** - Object storage for original documents
@@ -261,50 +269,61 @@ Entities are automatically extracted during document ingestion. You can also man
 ## API Endpoints
 
 ### Documents
+
 - `POST /api/documents` - Upload document
 - `GET /api/documents` - List documents
 - `GET /api/documents/{id}` - Get document details
 - `DELETE /api/documents/{id}` - Delete document
 
 ### Search
+
 - `GET /api/search?q={query}` - Full-text search
 - `GET /api/search/semantic?q={query}` - Semantic search
 
 ### Analysis
+
 - `POST /api/analyze` - Analyze document
 - `GET /api/analyze/{id}` - Get analysis results
 
 ### RAG
+
 - `POST /api/rag/query` - Ask questions about documents
 - `POST /api/rag/compare` - Compare multiple documents
 
 ### AutoRAG
+
 - `POST /api/rag/search` - Semantic search in document corpus
 - `POST /api/rag/context` - Assemble context for a query
 
 ### Knowledge Graph
+
 - `POST /api/graph/query` - Query the knowledge graph
 - `GET /api/graph/entities/{id}` - Get entity details
 - `GET /api/graph/relationships` - Explore relationships
 
 ### Health
+
 - `GET /api/health` - System health check
 
 ## Development
 
 ### Prerequisites
+
 - Node.js
 - Cloudflare account
 - Wrangler CLI
 - API keys for govinfo.gov and congress.gov (see `autorag/API_CONFIGURATION_GUIDE.md`)
 
 ### Setup
+
 1. Install dependencies:
+
    ```bash
    npm install
    ```
 
 2. Login to Cloudflare:
+
    ```bash
    wrangler login
    ```
@@ -315,6 +334,7 @@ Entities are automatically extracted during document ingestion. You can also man
    - See `autorag/API_CONFIGURATION_GUIDE.md` for detailed instructions
 
 4. Configure API keys:
+
    ```bash
    cp ingestion/config/api_config.json.example ingestion/config/api_config.json
    # Edit the file with your real API keys
@@ -322,16 +342,17 @@ Entities are automatically extracted during document ingestion. You can also man
    ```
 
 5. Create required Cloudflare resources:
+
    ```bash
    # Create D1 database
    wrangler d1 create opendiscourse-db
-   
+
    # Create R2 bucket
    wrangler r2 bucket create opendiscourse-documents
-   
+
    # Create KV namespace
    wrangler kv:namespace create "opendiscourse-cache"
-   
+
    # Create Vectorize index
    wrangler vectorize create opendiscourse-vector-index --dimensions 1024 --metric cosine
    ```
@@ -344,16 +365,19 @@ Entities are automatically extracted during document ingestion. You can also man
    ```
 
 ### Running Locally
+
 ```bash
 npm run dev
 ```
 
 ### Deployment
+
 ```bash
 npm run deploy
 ```
 
 ### Viewing Logs
+
 ```bash
 npm run logs
 ```
@@ -363,6 +387,7 @@ npm run logs
 The project includes a comprehensive data ingestion system for government data:
 
 ### Ingestion Scripts
+
 ```bash
 # Ingest govinfo.gov data
 npm run ingest:govinfo
@@ -378,10 +403,12 @@ npm run ingest:all
 ```
 
 ### Supported Sources
+
 - **govinfo.gov**: Legislative bills, congressional records, federal register, and more
 - **congress.gov**: Bills, members, committees, hearings
 
 ### File Processing
+
 - PDF, XML, HTML, Markdown, and plain text files
 - Automatic chunking for vectorization
 - Metadata extraction and preservation
@@ -391,6 +418,7 @@ npm run ingest:all
 The project includes an advanced agentic knowledge graph system for political analysis:
 
 ### Components
+
 - **Entity Extraction**: BERT-based NER for political entities
 - **Relationship Discovery**: Connection identification between entities
 - **Political Analysis**: Bias detection, sentiment analysis, fact-checking
@@ -398,6 +426,7 @@ The project includes an advanced agentic knowledge graph system for political an
 - **Graph Inference**: Automated relationship discovery
 
 ### Directory Structure
+
 ```
 agentic_graph/
 ├── agents/                 # Agent implementations
@@ -417,6 +446,7 @@ agentic_graph/
 The project includes Docker containers for deployment:
 
 ### Directory Structure
+
 ```
 docker/
 ├── neo4j/
@@ -428,6 +458,7 @@ docker/
 ```
 
 ### Quick Deployment
+
 ```bash
 # Start all services
 docker-compose up -d
@@ -439,6 +470,7 @@ docker-compose up -d
 ```
 
 ## Project Structure
+
 ```
 ├── src/
 │   └── index.ts              # Main worker implementation
@@ -549,4 +581,12 @@ To set up this repository on GitHub and GitLab:
 10. **Voice Analysis** - Speaker identification and voice pattern analysis
 11. **Cloudflare Containers** - Deploy Docker containers to Cloudflare Workers (June 2025)
 
+<<<<<<< HEAD
 OpenDiscourse represents the future of political document analysis, combining the power of Cloudflare's edge computing with advanced AI techniques to provide unprecedented insights into political discourse.
+=======
+# OpenDiscourse represents the future of political document analysis, combining the power of Cloudflare's edge computing with advanced AI techniques to provide unprecedented insights into political discourse.
+
+# opendiscourse.net-cf
+
+> > > > > > > b328189aabbeda0eb157cb62df9c02295c81962a
+>>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)

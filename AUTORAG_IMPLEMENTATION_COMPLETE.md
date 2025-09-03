@@ -46,6 +46,7 @@ For detailed configuration instructions, see `autorag/API_CONFIGURATION_GUIDE.md
 ## Documentation
 
 Complete documentation is available in:
+
 - `autorag/AUTORAG_README.md` - Main documentation
 - `autorag/AUTORAG_SETUP_GUIDE.md` - Deployment guide
 - `autorag/AUTORAG_IMPLEMENTATION_SUMMARY.md` - Technical summary
@@ -53,6 +54,7 @@ Complete documentation is available in:
 ## Verification
 
 Run the verification script to confirm all components:
+
 ```bash
 ./autorag/verify_implementation.sh
 ```

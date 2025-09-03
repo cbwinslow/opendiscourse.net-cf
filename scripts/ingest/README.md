@@ -15,18 +15,20 @@ The `govinfo_to_db.ts` script fetches data from the GovInfo.gov API and stores i
 ### Setup
 
 1. Install dependencies:
+
    ```bash
    npm install
    ```
 
 2. Create a `.env.local` file in the project root with the following variables:
+
    ```env
    # Database Configuration
    DATABASE_URL=postgresql://user:password@localhost:5432/opendiscourse
-   
+
    # API Keys
    GOVINFO_API_KEY=your-govinfo-api-key
-   
+
    # Ingestion Settings
    BATCH_SIZE=10
    MAX_PACKAGES=50
@@ -50,6 +52,7 @@ The script can be configured using environment variables:
 ### Collections
 
 The script processes the following GovInfo.gov collections by default:
+
 - BILLS: Congressional bills
 - CRPT: Congressional reports
 - CREC: Congressional Record
@@ -62,6 +65,7 @@ The script includes basic error handling and will continue processing if an erro
 ### Logging
 
 The script logs progress to the console, including:
+
 - When it starts and completes processing each collection
 - The number of packages processed
 - Any errors that occur

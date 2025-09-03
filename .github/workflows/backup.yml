@@ -1,0 +1,25 @@
+name: Nightly Backup
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # daily at 03:00 UTC
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Wrangler
+        run: npm install -g wrangler
+      - name: Run backup script
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          DOCUMENTS_BUCKET: ${{ secrets.DOCUMENTS_BUCKET }}
+        run: |
+          chmod +x scripts/backup_d1_to_r2.sh
+          ./scripts/backup_d1_to_r2.sh

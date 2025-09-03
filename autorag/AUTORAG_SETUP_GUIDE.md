@@ -14,11 +14,13 @@ Before you begin, ensure you have:
 ## Step 1: Configure Environment Variables
 
 1. Copy the example configuration file:
+
 ```bash
 cp ingestion/config/api_config.json.example ingestion/config/api_config.json
 ```
 
 2. Update the configuration with your credentials:
+
 ```json
 {
   "govinfo": {
@@ -39,21 +41,25 @@ cp ingestion/config/api_config.json.example ingestion/config/api_config.json
 ## Step 2: Set up Cloudflare Resources
 
 1. Login to Wrangler:
+
 ```bash
 wrangler login
 ```
 
 2. Create the Vectorize index:
+
 ```bash
 npm run setup:vectorize
 ```
 
 3. Create the D1 database:
+
 ```bash
 wrangler d1 create opendiscourse-db
 ```
 
 4. Create the R2 bucket:
+
 ```bash
 wrangler r2 bucket create opendiscourse-documents
 ```
@@ -61,6 +67,7 @@ wrangler r2 bucket create opendiscourse-documents
 ## Step 3: Update Wrangler Configuration
 
 Update `wrangler.toml` with your resource IDs:
+
 ```toml
 name = "opendiscourse"
 main = "src/index.ts"
@@ -95,6 +102,7 @@ index_name = "opendiscourse-vector-index"
 ## Step 4: Run Database Migrations
 
 Apply the database schema:
+
 ```bash
 npm run migrate
 ```
@@ -102,6 +110,7 @@ npm run migrate
 ## Step 5: Deploy the Worker
 
 Deploy your worker to Cloudflare:
+
 ```bash
 npm run deploy
 ```
@@ -109,6 +118,7 @@ npm run deploy
 ## Step 6: Ingest Data
 
 Start ingesting data from govinfo.gov:
+
 ```bash
 # Ingest bulkdata
 npm run ingest:bulkdata
@@ -122,6 +132,7 @@ npm run ingest:bulkdata -- BILLS CREC
 Once data is ingested, you can query the system:
 
 ### Semantic Search
+
 ```bash
 curl -X POST https://your-worker.your-subdomain.workers.dev/api/rag/search \
   -H "Content-Type: application/json" \
@@ -129,6 +140,7 @@ curl -X POST https://your-worker.your-subdomain.workers.dev/api/rag/search \
 ```
 
 ### Question Answering
+
 ```bash
 curl -X POST https://your-worker.your-subdomain.workers.dev/api/rag/query \
   -H "Content-Type: application/json" \
@@ -138,11 +150,13 @@ curl -X POST https://your-worker.your-subdomain.workers.dev/api/rag/query \
 ## Monitoring and Maintenance
 
 ### Check Processing Status
+
 ```bash
 curl https://your-worker.your-subdomain.workers.dev/api/health
 ```
 
 ### View Document Processing Overview
+
 Query the `autorag.document_processing_overview` view in your D1 database.
 
 ## Troubleshooting
@@ -162,7 +176,9 @@ Query the `autorag.document_processing_overview` view in your D1 database.
    - Check rate limits on the govinfo API
 
 ### Logs
+
 View logs for your worker:
+
 ```bash
 npm run logs
 ```

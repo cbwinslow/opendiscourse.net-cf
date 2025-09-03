@@ -5,6 +5,7 @@ This directory contains the AutoRAG (Automated Retrieval-Augmented Generation) s
 ## Overview
 
 The AutoRAG system automatically:
+
 1. Ingests bulkdata from govinfo.gov
 2. Processes documents (PDF, XML, HTML)
 3. Generates embeddings using Cloudflare AI
@@ -40,16 +41,19 @@ The AutoRAG system automatically:
 ## Components
 
 ### 1. Data Ingestion
+
 - `govinfo_bulkdata_processor.ts` - Processes bulkdata from govinfo.gov
 - Handles multiple document formats (PDF, XML, HTML)
 - Extracts metadata and content
 
 ### 2. Vector Database
+
 - `auto_rag_service.ts` - Manages vector operations
 - Generates embeddings using Cloudflare AI
 - Stores and retrieves document vectors
 
 ### 3. RAG API
+
 - `auto_rag_api.ts` - Provides semantic search and RAG endpoints
 - `/api/rag/query` - Question answering
 - `/api/rag/search` - Semantic search
@@ -63,15 +67,17 @@ The AutoRAG system automatically:
    - For Cloudflare: Get your Account ID from the Cloudflare dashboard
 
 2. **Configure API Keys**
+
    ```bash
    # Copy the example configuration file
    cp ingestion/config/api_config.json.example ingestion/config/api_config.json
-   
+
    # Edit the configuration file with your real API keys
    nano ingestion/config/api_config.json
    ```
-   
+
    Update the configuration with your actual credentials:
+
    ```json
    {
      "govinfo": {
@@ -94,16 +100,17 @@ The AutoRAG system automatically:
    ```
 
 3. **Create Cloudflare Resources**
+
    ```bash
    # Login to Cloudflare
    wrangler login
-   
+
    # Create Vectorize index
    npm run setup:vectorize
-   
+
    # Create D1 database
    wrangler d1 create opendiscourse-db
-   
+
    # Create R2 bucket
    wrangler r2 bucket create opendiscourse-documents
    ```
@@ -112,6 +119,7 @@ The AutoRAG system automatically:
    Update your `wrangler.toml` file with the actual resource IDs returned from the previous commands.
 
 5. **Run Database Migrations**
+
    ```bash
    npm run migrate
    ```
@@ -124,6 +132,7 @@ The AutoRAG system automatically:
 ## Usage
 
 ### Ingest Data
+
 ```bash
 # Ingest govinfo bulkdata
 npm run ingest:bulkdata
@@ -133,6 +142,7 @@ npm run ingest:bulkdata -- BILLS
 ```
 
 ### Query Data
+
 ```bash
 # Semantic search
 curl -X POST /api/rag/search \\
@@ -147,11 +157,11 @@ curl -X POST /api/rag/query \\
 
 ## API Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/rag/search` | POST | Semantic search in document corpus |
-| `/api/rag/query` | POST | Question answering with RAG |
-| `/api/rag/context` | POST | Assemble context for a query |
+| Endpoint           | Method | Description                        |
+| ------------------ | ------ | ---------------------------------- |
+| `/api/rag/search`  | POST   | Semantic search in document corpus |
+| `/api/rag/query`   | POST   | Question answering with RAG        |
+| `/api/rag/context` | POST   | Assemble context for a query       |
 
 ## Configuration
 

@@ -7,11 +7,13 @@ This guide provides detailed instructions for configuring the AutoRAG system to 
 Both API keys have been successfully configured in the system:
 
 ### govinfo.gov API Key
+
 - **Key**: `JRiK258tD1yRUWSnaeI2vUchbbjzyaZGoQT7LWfG`
 - **Status**: ✅ Configured and verified
 - **Usage**: Primary source for bulkdata and API access
 
 ### congress.gov API Key
+
 - **Key**: `nt7MSte5iCSAphsEVqv10WdjdNU0a7QHCfEagcFj`
 - **Status**: ✅ Configured and verified
 - **Usage**: Supplementary source for current legislative information
@@ -19,25 +21,30 @@ Both API keys have been successfully configured in the system:
 ## 2. Cloudflare Configuration
 
 ### Account ID
+
 1. Log in to your Cloudflare dashboard
 2. Click on your profile icon in the top right
 3. Select "My Profile"
 4. Your Account ID is displayed on this page
 
 ### Resource Setup
+
 You'll need to create the following Cloudflare resources:
 
 1. **D1 Database**
+
    ```bash
    wrangler d1 create opendiscourse-db
    ```
 
 2. **R2 Bucket**
+
    ```bash
    wrangler r2 bucket create opendiscourse-documents
    ```
 
 3. **Vectorize Index**
+
    ```bash
    wrangler vectorize create opendiscourse-vector-index --dimensions 1024 --metric cosine
    ```
@@ -50,17 +57,21 @@ You'll need to create the following Cloudflare resources:
 ## 3. Configuration File Setup
 
 ### Copy the Example Configuration
+
 ```bash
 cp ingestion/config/api_config.json.example ingestion/config/api_config.json
 ```
 
 ### Edit the Configuration File
+
 Open the configuration file in your preferred text editor:
+
 ```bash
 nano ingestion/config/api_config.json
 ```
 
 ### Update with Your Credentials
+
 Replace the placeholder values with your actual credentials:
 
 ```json
@@ -70,11 +81,11 @@ Replace the placeholder values with your actual credentials:
     "apiKey": "YOUR_REAL_GOVINFO_API_KEY_HERE",
     "bulkDataUrl": "https://www.govinfo.gov/bulkdata",
     "collections": [
-      "BILLS",      // Bills and Resolutions
-      "CREC",       // Congressional Record
-      "FR",         // Federal Register
-      "STATUTE",    // Statutes at Large
-      "PLAW"        // Public and Private Laws
+      "BILLS", // Bills and Resolutions
+      "CREC", // Congressional Record
+      "FR", // Federal Register
+      "STATUTE", // Statutes at Large
+      "PLAW" // Public and Private Laws
     ]
   },
   "congress": {
@@ -158,18 +169,23 @@ index_name = "opendiscourse-vector-index"
 ## 5. Test Your Configuration
 
 ### Validate API Keys
+
 You can test your govinfo API key with a simple curl command:
+
 ```bash
 curl "https://api.govinfo.gov/collections/BILLS?offset=0&pageSize=5&api_key=YOUR_GOVINFO_API_KEY"
 ```
 
 For congress.gov:
+
 ```bash
 curl "https://api.congress.gov/v3/bill?api_key=YOUR_CONGRESS_API_KEY&limit=5"
 ```
 
 ### Run a Test Ingestion
+
 After configuring everything, run a small test ingestion:
+
 ```bash
 # Test govinfo ingestion with a small limit
 npm run ingest:govinfo
@@ -184,16 +200,19 @@ npm run ingest:congress
 ## 6. Common Configuration Issues
 
 ### API Key Issues
+
 - If you get "403 Forbidden" errors, your API key may not be activated yet
 - If you get "401 Unauthorized" errors, double-check your API key
 - Some APIs have rate limits; if you get "429 Too Many Requests", reduce concurrentDownloads
 
 ### Cloudflare Resource Issues
+
 - Ensure all resource IDs in wrangler.toml match the ones created
 - Verify you're using the Workers Paid plan for Vectorize access
 - Check that your Cloudflare account has the necessary permissions
 
 ### Network Issues
+
 - If you're behind a corporate firewall, you may need to configure proxy settings
 - Some government APIs may have specific IP allowlisting requirements
 

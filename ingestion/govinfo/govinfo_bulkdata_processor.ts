@@ -118,8 +118,12 @@ export class GovInfoBulkDataProcessor {
   }
 
   // List bulkdata files for a collection
-  async listBulkDataFiles(collection: string, year?: number): Promise<BulkDataCollection[]> {
+  async listBulkDataFiles(
+    collection: string,
+    year?: number,
+  ): Promise<BulkDataCollection[]> {
     try {
+<<<<<<< HEAD
       console.log(`Fetching bulkdata files for collection: ${collection}${year ? ` (${year})` : ''}`);
       
       // In a production environment, we would fetch the actual file list
@@ -128,6 +132,37 @@ export class GovInfoBulkDataProcessor {
       
     } catch (error) {
       console.error(`Error listing files for collection ${collection}:`, error);
+=======
+      console.log(
+        `Listing bulkdata files for collection: ${collection}${year ? ` (${year})` : ""}`,
+      );
+
+      // In a real implementation, we would fetch the actual bulkdata files
+      // For now, we'll simulate some results
+      return [
+        {
+          collection: collection,
+          publishedAt: new Date().toISOString(),
+          granuleClass: "PDF",
+          title: `Sample ${collection} Document`,
+          downloadUrl: `${this.baseUrl}/${collection}/sample.pdf`,
+          mimeType: "application/pdf",
+        },
+        {
+          collection: collection,
+          publishedAt: new Date(Date.now() - 86400000).toISOString(), // Yesterday
+          granuleClass: "XML",
+          title: `Sample ${collection} Metadata`,
+          downloadUrl: `${this.baseUrl}/${collection}/sample.xml`,
+          mimeType: "application/xml",
+        },
+      ];
+    } catch (error) {
+      console.error(
+        `Error listing bulkdata files for collection ${collection}:`,
+        error,
+      );
+>>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
       throw error;
     }
   }
@@ -138,6 +173,7 @@ export class GovInfoBulkDataProcessor {
     const timeout = setTimeout(() => controller.abort(), this.config.ingestion.timeout || 30000);
     
     try {
+<<<<<<< HEAD
       const response = await fetch(url, { 
         signal: controller.signal,
         highWaterMark: 1024 * 1024, // 1MB chunks
@@ -153,6 +189,30 @@ export class GovInfoBulkDataProcessor {
       const fileStream = createWriteStream(destination, { highWaterMark: 1024 * 1024 });
       await pipelineAsync(response.body, fileStream);
       
+=======
+      console.log(`Processing bulkdata file: ${fileInfo.title}`);
+
+      // In a real implementation, we would:
+      // 1. Download the file from fileInfo.downloadUrl
+      // 2. Parse the content based on mimeType
+      // 3. Extract text and metadata
+      // 4. Chunk the document
+      // 5. Generate embeddings
+      // 6. Store in databases
+
+      // Simulate processing
+      const documentId = `doc_${Date.now()}`;
+      const content = `This is simulated content from ${fileInfo.title}. In a real implementation, this would be the actual parsed content from the downloaded file.`;
+
+      return {
+        documentId: documentId,
+        title: fileInfo.title,
+        collection: fileInfo.collection,
+        mimeType: fileInfo.mimeType,
+        content: content,
+        processedAt: new Date().toISOString(),
+      };
+>>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
     } catch (error) {
       // Clean up partially downloaded file
       if (existsSync(destination)) {
@@ -322,12 +382,16 @@ export class GovInfoBulkDataProcessor {
   }
 
   // Process all bulkdata for a collection
-  async processCollectionBulkData(collection: string, limit: number = 100): Promise<void> {
+  async processCollectionBulkData(
+    collection: string,
+    limit: number = 100,
+  ): Promise<void> {
     try {
       console.log(`Processing bulkdata for collection: ${collection}`);
-      
+
       // Get list of files
       const files = await this.listBulkDataFiles(collection);
+<<<<<<< HEAD
       
       // Process files in parallel batches
       const batchSize = this.config.ingestion.batchSize || 10;
@@ -345,40 +409,58 @@ export class GovInfoBulkDataProcessor {
         
         // Small delay between batches to prevent overwhelming the system
         await new Promise(resolve => setTimeout(resolve, 100));
+=======
+
+      // Process files (up to limit)
+      const processLimit = Math.min(files.length, limit);
+      for (let i = 0; i < processLimit; i++) {
+        const fileInfo = files[i];
+        try {
+          await this.processBulkDataFile(fileInfo);
+          console.log(`Successfully processed file: ${fileInfo.title}`);
+        } catch (error) {
+>>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
           console.error(`Failed to process file ${fileInfo.title}:`, error);
         }
       }
-      
-      console.log(`Finished processing ${processLimit} files for collection: ${collection}`);
+
+      console.log(
+        `Finished processing ${processLimit} files for collection: ${collection}`,
+      );
     } catch (error) {
-      console.error(`Error processing bulkdata for collection ${collection}:`, error);
+      console.error(
+        `Error processing bulkdata for collection ${collection}:`,
+        error,
+      );
       throw error;
     }
   }
 
   // Process bulkdata for all collections
-  async processAllCollectionsBulkData(limitPerCollection: number = 100): Promise<void> {
+  async processAllCollectionsBulkData(
+    limitPerCollection: number = 100,
+  ): Promise<void> {
     try {
       console.log("Processing bulkdata for all collections");
-      
+
       const collections = await this.getAvailableCollections();
       const bulkConfig = this.config.autorag?.bulkDataProcessing || {};
       const concurrentCollections = bulkConfig.concurrentCollections || 3;
-      
+
       // Process collections with limited concurrency
       for (let i = 0; i < collections.length; i += concurrentCollections) {
         const batch = collections.slice(i, i + concurrentCollections);
-        const promises = batch.map(collection => 
-          this.processCollectionBulkData(collection, limitPerCollection)
+        const promises = batch.map((collection) =>
+          this.processCollectionBulkData(collection, limitPerCollection),
         );
-        
+
         try {
           await Promise.all(promises);
         } catch (error) {
           console.error("Error processing collection batch:", error);
         }
       }
-      
+
       console.log("Finished processing bulkdata for all collections");
     } catch (error) {
       console.error("Error processing all collections bulkdata:", error);
