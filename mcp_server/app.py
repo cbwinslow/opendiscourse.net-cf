@@ -41,6 +41,7 @@ def create_bitbucket_repo(req: RepoRequest):
             "is_private": True,
             "description": req.description,
         },
+        timeout=10,
     )
     if resp.status_code not in (200, 201):
         raise HTTPException(status_code=resp.status_code, detail=resp.text)
