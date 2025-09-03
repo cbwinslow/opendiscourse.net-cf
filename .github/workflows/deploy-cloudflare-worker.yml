@@ -1,0 +1,33 @@
+name: Deploy Cloudflare Worker
+
+on:
+  push:
+    branches: [ main, ci/integrations ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies (worker)
+        working-directory: cloudflare-container-worker
+        run: |
+          npm ci --silent
+
+      - name: Build worker (if present)
+        working-directory: cloudflare-container-worker
+        run: |
+          npm run build --silent || true
+
+      - name: Publish with Wrangler
+        uses: cloudflare/wrangler-action@v1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          workingDirectory: cloudflare-container-worker
