@@ -18,20 +18,9 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv(os.path.join(os.path.dirname(__file__), '../../.env'))
 
-# If running under pytest and RUN_INFRA_TESTS is not set, skip collection so
-# integration checks don't fail CI or local unit-test runs that lack Postgres.
-try:
-    if 'pytest' in sys.modules and os.getenv('RUN_INFRA_TESTS', '0') != '1':
-        import pytest
-
-        pytest.skip(
-            "Skipping infrastructure integration tests during unit test runs; set RUN_INFRA_TESTS=1 to run",
-            allow_module_level=True,
-        )
-except Exception:
-    # If pytest isn't available or skip failed, continue — script can still be
-    # executed directly for manual infra testing.
-    pass
+# Note: this file defines TestInfrastructure and can be executed directly as a
+# standalone integration script. Integration pytest wrappers live under
+# `infrastructure/tests/` and will choose whether to run these checks.
 
 class TestInfrastructure:
     def __init__(self):
