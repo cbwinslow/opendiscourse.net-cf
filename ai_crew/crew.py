@@ -185,9 +185,9 @@ class CodebaseAnalysisCrew:
                 "quality_assessment": _normalize(
                     getattr(self.tasks.get("quality_assurance"), "output", None)
                 ),
-                # task key is 'improvement_proposals' in _create_tasks
-                "improvement_proposals": _normalize(
-                    getattr(self.tasks.get("improvement_proposals"), "output", None)
+                # task key is 'improvement_proposal' in _create_tasks
+                "improvement_proposal": _normalize(
+                    getattr(self.tasks.get("improvement_proposal"), "output", None)
                 ),
                 "raw_result": str(result)
             }
