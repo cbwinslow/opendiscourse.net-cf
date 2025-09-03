@@ -57,9 +57,9 @@ def create_jira_issue(req: IssueRequest):
         return {
             "status": "simulated",
             "message": (
-                "Would create Jira issue '" + req.title + "' in " +
-                (project or "<project>")
-            )
+                f"Would create Jira issue '{req.title}' in "
+                + (project or "<project>")
+            ),
         }
 
     url = f"{base.rstrip('/')}/rest/api/2/issue"
