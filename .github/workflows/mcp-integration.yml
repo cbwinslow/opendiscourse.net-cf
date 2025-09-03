@@ -1,0 +1,33 @@
+name: MCP Integration Example
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-mcp-and-integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install MCP server deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r mcp_server/requirements.txt
+      - name: Start MCP server in background
+        run: nohup python -m uvicorn mcp_server.app:app --host 127.0.0.1 --port 8080 &>/tmp/mcp.log &
+      - name: Wait for MCP
+        run: |
+          for i in `seq 1 10`; do
+            curl -sSf http://127.0.0.1:8080/health && break || sleep 1
+          done
+      - name: Create Jira issue via MCP (example)
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER: ${{ secrets.JIRA_USER }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_PROJECT_KEY: ${{ secrets.JIRA_PROJECT_KEY }}
+        run: |
+          curl -s -X POST http://127.0.0.1:8080/jira/issues -H 'Content-Type: application/json' -d '{"title":"CI-created issue","body":"Created by MCP integration job"}'
