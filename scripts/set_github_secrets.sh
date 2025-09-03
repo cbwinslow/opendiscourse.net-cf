@@ -19,6 +19,9 @@ read -rp "Enter CF_PAGES_PROJECT (optional): " CF_PAGES_PROJECT
 read -rp "Enter GCP_PROJECT_ID (optional, required for Cloud Run): " GCP_PROJECT_ID
 echo "Paste GCP_SERVICE_ACCOUNT_KEY JSON (one line) or leave blank:"
 read -r GCP_SERVICE_ACCOUNT_KEY
+read -rp "Enter X/Twitter API token (optional): " X_API_TOKEN
+read -rp "Enter YOUTUBE_API_KEY (optional): " YOUTUBE_API_KEY
+read -rp "Enter OPENAI_API_KEY or transcription key (optional): " OPENAI_API_KEY
 
 echo "Setting secrets on $REPO..."
 gh secret set CF_API_TOKEN -b"$CF_API_TOKEN" -R "$REPO"
@@ -39,6 +42,15 @@ if [ -n "$GCP_PROJECT_ID" ]; then
 fi
 if [ -n "$GCP_SERVICE_ACCOUNT_KEY" ]; then
   gh secret set GCP_SERVICE_ACCOUNT_KEY -b"$GCP_SERVICE_ACCOUNT_KEY" -R "$REPO"
+fi
+if [ -n "$X_API_TOKEN" ]; then
+  gh secret set X_API_TOKEN -b"$X_API_TOKEN" -R "$REPO"
+fi
+if [ -n "$YOUTUBE_API_KEY" ]; then
+  gh secret set YOUTUBE_API_KEY -b"$YOUTUBE_API_KEY" -R "$REPO"
+fi
+if [ -n "$OPENAI_API_KEY" ]; then
+  gh secret set OPENAI_API_KEY -b"$OPENAI_API_KEY" -R "$REPO"
 fi
 
 echo "Secrets set. Verify in repository settings -> Secrets." 
