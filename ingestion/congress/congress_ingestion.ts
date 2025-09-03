@@ -1,6 +1,8 @@
 // Congress.gov data ingestion module
 // Handles fetching and processing data from the Congress.gov API
 
+import { IngestionUtils, RateLimitConfig } from '../shared/ingestion_utils.js';
+
 interface CongressConfig {
   apiBaseUrl: string;
   apiKey: string;
@@ -35,176 +37,143 @@ export class CongressIngestion {
   constructor(config: CongressConfig) {
     this.config = config;
     this.baseUrl = config.apiBaseUrl;
+
+    // Set up rate limiting for Congress API
+    IngestionUtils.setRateLimit({
+      maxRequests: 1000,
+      perMilliseconds: 3600000, // 1 hour
+      maxRPS: 5 // Conservative limit for Congress API
+    } as RateLimitConfig);
   }
 
   // Fetch bills
   async fetchBills(offset: number = 0, pageSize: number = 250): Promise<any> {
     const url = `${this.baseUrl}/bill?api_key=${this.config.apiKey}&offset=${offset}&limit=${pageSize}`;
     console.log(`Fetching bills from ${url}`);
-    
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error(`Error fetching bills:`, error);
-      throw error;
+
+    const result = await IngestionUtils.fetchWithRateLimit(url, undefined, 3, 30000);
+    if (!result.success) {
+      throw IngestionUtils.handleError(result.error, 'fetchBills');
     }
+
+    return result.data;
   }
 
   // Fetch bill details
   async fetchBillDetails(billId: string): Promise<any> {
     const url = `${this.baseUrl}/bill/${billId}?api_key=${this.config.apiKey}`;
     console.log(`Fetching bill details for ${billId} from ${url}`);
-    
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error(`Error fetching bill details for ${billId}:`, error);
-      throw error;
+
+    const result = await IngestionUtils.fetchWithRateLimit(url, undefined, 3, 30000);
+    if (!result.success) {
+      throw IngestionUtils.handleError(result.error, `fetchBillDetails-${billId}`);
     }
+
+    return result.data;
   }
 
   // Fetch bill subjects
   async fetchBillSubjects(billId: string): Promise<any> {
     const url = `${this.baseUrl}/bill/${billId}/subjects?api_key=${this.config.apiKey}`;
     console.log(`Fetching bill subjects for ${billId} from ${url}`);
-    
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error(`Error fetching bill subjects for ${billId}:`, error);
-      throw error;
+
+    const result = await IngestionUtils.fetchWithRateLimit(url, undefined, 3, 30000);
+    if (!result.success) {
+      throw IngestionUtils.handleError(result.error, `fetchBillSubjects-${billId}`);
     }
+
+    return result.data;
   }
 
   // Fetch bill summaries
   async fetchBillSummaries(billId: string): Promise<any> {
     const url = `${this.baseUrl}/bill/${billId}/summaries?api_key=${this.config.apiKey}`;
     console.log(`Fetching bill summaries for ${billId} from ${url}`);
-    
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error(`Error fetching bill summaries for ${billId}:`, error);
-      throw error;
+
+    const result = await IngestionUtils.fetchWithRateLimit(url, undefined, 3, 30000);
+    if (!result.success) {
+      throw IngestionUtils.handleError(result.error, `fetchBillSummaries-${billId}`);
     }
+
+    return result.data;
   }
 
   // Fetch bill actions
   async fetchBillActions(billId: string): Promise<any> {
     const url = `${this.baseUrl}/bill/${billId}/actions?api_key=${this.config.apiKey}`;
     console.log(`Fetching bill actions for ${billId} from ${url}`);
-    
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error(`Error fetching bill actions for ${billId}:`, error);
-      throw error;
+
+    const result = await IngestionUtils.fetchWithRateLimit(url, undefined, 3, 30000);
+    if (!result.success) {
+      throw IngestionUtils.handleError(result.error, `fetchBillActions-${billId}`);
     }
+
+    return result.data;
   }
 
   // Fetch bill cosponsors
   async fetchBillCosponsors(billId: string): Promise<any> {
     const url = `${this.baseUrl}/bill/${billId}/cosponsors?api_key=${this.config.apiKey}`;
     console.log(`Fetching bill cosponsors for ${billId} from ${url}`);
-    
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error(`Error fetching bill cosponsors for ${billId}:`, error);
-      throw error;
+
+    const result = await IngestionUtils.fetchWithRateLimit(url, undefined, 3, 30000);
+    if (!result.success) {
+      throw IngestionUtils.handleError(result.error, `fetchBillCosponsors-${billId}`);
     }
+
+    return result.data;
   }
 
   // Fetch members of Congress
   async fetchMembers(offset: number = 0, pageSize: number = 250): Promise<any> {
     const url = `${this.baseUrl}/member?api_key=${this.config.apiKey}&offset=${offset}&limit=${pageSize}`;
     console.log(`Fetching members from ${url}`);
-    
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error(`Error fetching members:`, error);
-      throw error;
+
+    const result = await IngestionUtils.fetchWithRateLimit(url, undefined, 3, 30000);
+    if (!result.success) {
+      throw IngestionUtils.handleError(result.error, 'fetchMembers');
     }
+
+    return result.data;
   }
 
   // Fetch member details
   async fetchMemberDetails(memberId: string): Promise<any> {
     const url = `${this.baseUrl}/member/${memberId}?api_key=${this.config.apiKey}`;
     console.log(`Fetching member details for ${memberId} from ${url}`);
-    
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error(`Error fetching member details for ${memberId}:`, error);
-      throw error;
+
+    const result = await IngestionUtils.fetchWithRateLimit(url, undefined, 3, 30000);
+    if (!result.success) {
+      throw IngestionUtils.handleError(result.error, `fetchMemberDetails-${memberId}`);
     }
+
+    return result.data;
   }
 
   // Fetch committees
   async fetchCommittees(offset: number = 0, pageSize: number = 250): Promise<any> {
     const url = `${this.baseUrl}/committee?api_key=${this.config.apiKey}&offset=${offset}&limit=${pageSize}`;
     console.log(`Fetching committees from ${url}`);
-    
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error(`Error fetching committees:`, error);
-      throw error;
+
+    const result = await IngestionUtils.fetchWithRateLimit(url, undefined, 3, 30000);
+    if (!result.success) {
+      throw IngestionUtils.handleError(result.error, 'fetchCommittees');
     }
+
+    return result.data;
   }
 
   // Fetch committee details
   async fetchCommitteeDetails(committeeId: string): Promise<any> {
     const url = `${this.baseUrl}/committee/${committeeId}?api_key=${this.config.apiKey}`;
     console.log(`Fetching committee details for ${committeeId} from ${url}`);
-    
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error(`Error fetching committee details for ${committeeId}:`, error);
-      throw error;
+
+    const result = await IngestionUtils.fetchWithRateLimit(url, undefined, 3, 30000);
+    if (!result.success) {
+      throw IngestionUtils.handleError(result.error, `fetchCommitteeDetails-${committeeId}`);
     }
+
+    return result.data;
   }
 
   // Process a bill and its related data
@@ -239,44 +208,55 @@ export class CongressIngestion {
   // Ingest bills
   async ingestBills(limit: number = 10000): Promise<void> {
     console.log(`Ingesting bills (limit: ${limit})`);
-    
+
     let offset = 0;
     let totalProcessed = 0;
-    
+    const pageSize = 250;
+    const allBillIds: string[] = [];
+
     try {
-      while (totalProcessed < limit) {
-        const billsData = await this.fetchBills(offset, Math.min(250, limit - totalProcessed));
-        
+      // First, collect all bill IDs to process
+      while (totalProcessed < limit && allBillIds.length < limit) {
+        const billsData = await this.fetchBills(offset, Math.min(pageSize, limit - totalProcessed));
+
         if (!billsData.bills || billsData.bills.length === 0) {
           console.log("No more bills found");
           break;
         }
-        
-        console.log(`Found ${billsData.bills.length} bills`);
-        
-        // Process each bill
-        for (const bill of billsData.bills) {
-          if (totalProcessed >= limit) break;
-          
-          try {
-            const processedBill = await this.processBill(bill.billId);
-            console.log(`Successfully processed bill ${bill.billId}`);
-            totalProcessed++;
-          } catch (error) {
-            console.error(`Failed to process bill ${bill.billId}:`, error);
-          }
-        }
-        
+
+        console.log(`Found ${billsData.bills.length} bills at offset ${offset}`);
+        allBillIds.push(...billsData.bills.map((bill: any) => bill.billId));
         offset += billsData.bills.length;
-        
-        // Add a small delay to avoid overwhelming the API
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        totalProcessed += billsData.bills.length;
       }
-      
-      console.log(`Finished ingesting ${totalProcessed} bills`);
+
+      // Process bills in batches using IngestionUtils
+      const processedCount = await IngestionUtils.processInBatches(
+        allBillIds.slice(0, limit),
+        10, // Process 10 bills per batch
+        async (batch: string[]) => {
+          const billPromises = batch.map(async (billId) => {
+            try {
+              const processedBill = await this.processBill(billId);
+              console.log(`Successfully processed bill ${billId}`);
+              return { success: true, billId, data: processedBill };
+            } catch (error) {
+              console.error(`Failed to process bill ${billId}:`, error);
+              return { success: false, billId, error };
+            }
+          });
+
+          await Promise.all(billPromises);
+        },
+        (completed: number, total: number) => {
+          console.log(`Processed ${completed}/${total} bill batches`);
+        }
+      );
+
+      console.log(`Finished ingesting ${allBillIds.length} bills`);
     } catch (error) {
-      console.error(`Error ingesting bills:`, error);
-      throw error;
+      console.error('Error ingesting bills:', error);
+      throw IngestionUtils.handleError(error, 'ingestBills');
     }
   }
 

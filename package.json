@@ -6,31 +6,51 @@
   "scripts": {
     "build": "tsc",
     "dev": "wrangler dev",
+    "start": "wrangler dev",
     "deploy": "wrangler deploy",
     "deploy:prod": "wrangler deploy --env production",
     "deploy:staging": "wrangler deploy --env staging",
     "logs": "wrangler tail",
     "logs:prod": "wrangler tail --env production",
     "logs:staging": "wrangler tail --env staging",
+    
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "typecheck": "tsc --noEmit",
+    "check": "npm run lint && npm run typecheck && npm test",
+    
     "setup": "npx tsx scripts/setup/init-cloudflare.ts",
-    "migrate:dev": "wrangler d1 migrations apply opendiscourse-db --local",
-    "migrate:prod": "wrangler d1 migrations apply opendiscourse-db --remote",
+    "setup:dev": "./scripts/setup-dev.sh",
+    "db:migrate": "wrangler d1 migrations apply opendiscourse-db --local",
+    "db:migrate:prod": "wrangler d1 migrations apply opendiscourse-db --remote",
+    "db:studio": "npx prisma studio",
+    
     "ingest:govinfo": "npx ts-node ingestion/scripts/ingestion.ts govinfo",
     "ingest:all": "npx ts-node ingestion/scripts/ingestion.ts all",
-    "test:ingestion": "npx ts-node ingestion/scripts/test_ingestion.ts"
+    "ingest:test": "npx ts-node ingestion/scripts/test_ingestion.ts",
+    
+    "docs:api": "npx @redocly/cli build-docs openapi.yaml --output docs/api.html",
+    "docs:serve": "npx http-server docs -p 8080"
   },
   "dependencies": {
+    "@types/cheerio": "^0.22.35",
+    "@types/jsdom": "^21.1.6",
     "@types/node": "^20.11.24",
+    "@types/node-fetch": "^2.6.11",
     "@types/pg": "^8.15.5",
     "@types/uuid": "^9.0.8",
+    "axios": "^1.6.7",
+    "cheerio": "^1.0.0-rc.12",
     "dotenv": "^16.4.5",
     "hono": "^4.1.3",
+    "jsdom": "^24.0.0",
     "langchain": "^0.3.31",
+    "node-fetch": "^3.3.2",
     "zod": "^3.22.4"
   },
   "devDependencies": {

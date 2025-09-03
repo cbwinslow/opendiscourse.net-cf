@@ -1,0 +1,244 @@
+openapi: 3.0.0
+info:
+  title: OpenDiscourse API
+  description: |
+    API for OpenDiscourse - A political document analysis platform.
+    This API provides access to document management, search, and analysis features.
+  version: 1.0.0
+  contact:
+    name: API Support
+    url: https://github.com/your-org/opendiscourse
+    email: support@opendiscourse.net
+
+servers:
+  - url: https://api.opendiscourse.net/v1
+    description: Production server
+  - url: http://localhost:8787/v1
+    description: Local development server
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Document:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        title:
+          type: string
+          example: "Sample Political Document"
+        source:
+          type: string
+          example: "govinfo"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Not Found"
+        message:
+          type: string
+          example: "The requested resource was not found"
+
+paths:
+  /documents:
+    get:
+      summary: List all documents
+      description: Returns a paginated list of documents.
+      tags:
+        - Documents
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: Page number
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+          description: Number of items per page
+      responses:
+        '200':
+          description: A list of documents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Document'
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                      limit:
+                        type: integer
+                      total:
+                        type: integer
+    post:
+      summary: Upload a document
+      description: Upload a new document for processing and analysis.
+      tags:
+        - Documents
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                title:
+                  type: string
+                source:
+                  type: string
+                  enum: [upload, govinfo, congress]
+      responses:
+        '201':
+          description: Document uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+  
+  /documents/{id}:
+    get:
+      summary: Get document by ID
+      description: Returns a single document by its ID.
+      tags:
+        - Documents
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Document found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '404':
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /search:
+    get:
+      summary: Search documents
+      description: Search documents with full-text and semantic search.
+      tags:
+        - Search
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Search query
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [fulltext, semantic, both]
+            default: both
+          description: Type of search to perform
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Document'
+
+  /analyze:
+    post:
+      summary: Analyze document
+      description: Analyze a document with various NLP techniques.
+      tags:
+        - Analysis
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - documentId
+              properties:
+                documentId:
+                  type: string
+                  format: uuid
+                analyze:
+                  type: array
+                  items:
+                    type: string
+                    enum: [entities, sentiment, topics, summary]
+      responses:
+        '200':
+          description: Analysis results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  documentId:
+                    type: string
+                  analysis:
+                    type: object
+                    properties:
+                      entities:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            text:
+                              type: string
+                            type:
+                              type: string
+                            confidence:
+                              type: number
+                      sentiment:
+                        type: object
+                        properties:
+                          polarity:
+                            type: number
+                          subjectivity:
+                            type: number
+                      topics:
+                        type: array
+                        items:
+                          type: string
+                      summary:
+                        type: string

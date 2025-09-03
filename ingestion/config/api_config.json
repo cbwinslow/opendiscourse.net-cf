@@ -37,11 +37,19 @@
     "d1Database": "opendiscourse-db"
   },
   "ingestion": {
-    "chunkSize": 1000,
-    "batchSize": 50,
-    "maxRetries": 3,
-    "retryDelay": 1000,
-    "concurrentDownloads": 5
+    "chunkSize": 2000,
+    "batchSize": 100,
+    "maxRetries": 2,
+    "retryDelay": 500,
+    "concurrentDownloads": 15,
+    "useStreaming": true,
+    "memoryCacheSize": 52428800,
+    "timeout": 30000,
+    "rateLimit": {
+      "maxRequests": 100,
+      "perMilliseconds": 60000,
+      "maxRPS": 30
+    }
   },
   "parsers": {
     "pdf": {

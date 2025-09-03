@@ -1,5 +1,5 @@
 name = "opendiscourse"
-main = "src/index.ts"
+main = "src/worker.ts"
 compatibility_date = "2025-08-28"
 compatibility_flags = [ "nodejs_compat" ]
 account_id = "968ff4ee9f5e59bc6c72758269d6b9d6"
@@ -62,18 +62,7 @@ max_batch_timeout = 10
 [ai]
 binding = "AI"
 
-# Pages configuration
-[build]
-command = "npm run build"
-publish = "dist"
-
-[build.upload]
-format = "modules"
-main = "./dist/worker.js"
-
-[build.upload.rules]
-type = "ESModule"
-glob = "**/*.js"
+# Build configuration removed - using direct main file
 
 # Environment overrides
 [env.production]

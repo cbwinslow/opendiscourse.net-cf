@@ -1,16 +1,196 @@
-<<<<<<< HEAD
 # OpenDiscourse: Political Document Analyzer
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0-blue.svg)](https://swagger.io/specification/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-4.9.5-blue.svg)](https://www.typescriptlang.org/)
+[![Cloudflare Workers](https://img.shields.io/badge/Cloudflare%20Workers-F38020?logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
 
 OpenDiscourse is a comprehensive political document analysis platform built on Cloudflare's powerful suite of services. It leverages Workers, D1, R2, KV, Vectorize, and AI Gateway to provide advanced document management, search, analysis, and RAG (Retrieval Augmented Generation) capabilities.
 
-## Features
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+ and npm
+- Cloudflare Wrangler CLI (`npm install -g wrangler`)
+- PostgreSQL 14+ (for local development)
+- Git
+- Supabase account (for authentication and database)
+- Cloudflare account (for deployment)
+- API keys for required services (see Configuration section)
+
+### Local Development
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/your-org/opendiscourse.net-cf.git
+   cd opendiscourse.net-cf
+   ```
+
+2. **Run the setup script**
+
+   ```bash
+   # Make the script executable
+   chmod +x scripts/setup-dev.sh
+   
+   # Run the setup script
+   ./scripts/setup-dev.sh
+   ```
+   
+   The script will:
+   - Check for required tools and dependencies
+   - Install Node.js dependencies
+   - Set up environment variables
+   - Create and configure the database
+   - Run database migrations
+
+3. **Configure your environment**
+
+   If you haven't already, edit the `.env` file with your configuration:
+   - Get Supabase credentials from your Supabase project settings
+   - Generate a secure session secret: `openssl rand -base64 32`
+   - Add API keys for required services (OpenAI, etc.)
+
+4. **Start the development server**
+
+   ```bash
+   npm run dev
+   ```
+
+5. **Access the application**
+
+   - Frontend: [http://localhost:3000](http://localhost:3000)
+   - API: [http://localhost:8787](http://localhost:8787)
+
+### Manual Setup (Alternative)
+
+If you prefer to set up the project manually, follow these steps:
+
+1. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+3. **Set up the database**
+   ```bash
+   createdb opendiscourse
+   npx wrangler d1 migrations apply opendiscourse-db --local
+   ```
+
+For detailed setup instructions, see our [SETUP.md](SETUP.md) guide.
+
+## 📚 Documentation
+
+- [System Architecture](SYSTEM_ARCHITECTURE.md)
+- [API Documentation](https://api.opendiscourse.net/docs) (when deployed)
+- [Deployment Guide](DEPLOYMENT.md)
+- [Contributing Guide](CONTRIBUTING.md)
+
+## 📄 Document Providers
+
+OpenDiscourse supports multiple document providers for ingesting political documents. The system comes pre-configured with several common providers:
+
+### Available Providers
+
+1. **GOVINFO** - U.S. Government Publishing Office
+   - Requires API key
+   - Provides congressional bills, federal register, and more
+   - Daily sync recommended
+
+2. **ProPublica Congress API**
+   - Requires API key
+   - Comprehensive U.S. legislative data
+   - Daily sync recommended
+
+3. **Congress.gov**
+   - No API key required
+   - Official U.S. federal legislative information
+   - Weekly sync recommended
+
+4. **GovTrack**
+   - No API key required
+   - Tracks U.S. Congress activities
+   - Daily sync recommended
+
+5. **OpenSecrets**
+   - Requires API key
+   - Tracks money in U.S. politics
+   - Monthly sync recommended
+
+### Managing Providers
+
+To set up the default providers:
+
+```bash
+# Install dependencies if not already done
+npm install
+
+# Run the provider setup script
+npx ts-node ingestion/scripts/setup_providers.ts
+```
+
+### Adding a New Provider
+
+1. Edit `ingestion/scripts/setup_providers.ts`
+2. Add a new entry to the `COMMON_PROVIDERS` array
+3. Run the setup script again
+
+### Provider Configuration
+
+Each provider can be configured with the following settings:
+- API endpoints
+- Rate limiting
+- Sync frequency
+- Authentication keys
+- Provider-specific parameters
+
+## 🏛️ Entity Management
+
+OpenDiscourse extracts and tracks entities from documents, including:
+
+- People (politicians, public figures)
+- Organizations (government agencies, corporations)
+- Locations
+- Legislative bills
+- Committees
+- Political parties
+
+### Entity Types
+
+The system supports the following entity types by default:
+
+| Type ID | Description | Example |
+|---------|-------------|---------|
+| PERSON | Individual person | "Nancy Pelosi" |
+| ORGANIZATION | Company or organization | "U.S. Senate" |
+| LOCATION | Geographical location | "Washington, D.C." |
+| BILL | Legislative bill | "H.R. 1" |
+| COMMITTEE | Legislative committee | "House Judiciary Committee" |
+| POLITICAL_PARTY | Political party | "Democratic Party" |
+| GOVERNMENT_AGENCY | Government department | "Department of Justice" |
+| POLITICAL_POSITION | Government role | "Speaker of the House" |
+
+### Managing Entities
+
+Entities are automatically extracted during document ingestion. You can also manage them manually through the API or database.
+
+## ✨ Features
 
 ### Document Management
+
 - Upload and store political documents (PDF, TXT, DOCX)
 - Automatic metadata extraction
 - Document versioning and history tracking
 
 ### AI-Powered Analysis
+
 - Natural Language Processing for entity extraction
 - Sentiment analysis of political content
 - Topic modeling and categorization
@@ -18,12 +198,14 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 - Summarization of long documents
 
 ### Search & Discovery
+
 - Full-text search across all documents
 - Semantic search using vector embeddings
 - Advanced filtering by date, author, topic, sentiment
 - Similar document recommendations
 
 ### RAG (Retrieval Augmented Generation)
+
 - Question answering over political documents
 - Context-aware responses with citations
 - Multi-document synthesis and comparison
@@ -31,12 +213,14 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 - AutoRAG database for semantic search and question answering
 
 ### Visualization & Reporting
+
 - Interactive dashboards for political analysis
 - Trend analysis over time
 - Comparative analysis between politicians/parties
 - Exportable reports and visualizations
 
 ### Data Ingestion
+
 - Automated ingestion from govinfo.gov (API and bulkdata)
 - Support for multiple document formats (PDF, XML, HTML, Markdown, TXT)
 - Webhook system for real-time updates
@@ -44,6 +228,7 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 - AutoRAG database for govinfo.gov/bulkdata processing (recommended approach)
 
 ### Agentic Knowledge Graph
+
 - Entity and relationship extraction using BERT-based NER
 - Political bias detection and sentiment analysis
 - Fact-checking and hate speech detection
@@ -365,6 +550,3 @@ To set up this repository on GitHub and GitLab:
 11. **Cloudflare Containers** - Deploy Docker containers to Cloudflare Workers (June 2025)
 
 OpenDiscourse represents the future of political document analysis, combining the power of Cloudflare's edge computing with advanced AI techniques to provide unprecedented insights into political discourse.
-=======
-# opendiscourse.net-cf
->>>>>>> b328189aabbeda0eb157cb62df9c02295c81962a
