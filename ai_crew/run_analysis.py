@@ -75,22 +75,36 @@ def run_analysis(args):
     """Run the AI analysis crew and handle the results."""
     print(f"Starting AI code analysis (scope: {args.scope})...")
     
-    # Initialize the crew
-    crew = CodebaseAnalysisCrew(repo_path=args.repo_path)
-    
-    # Run the analysis
-    results = crew.kickoff()
-    
-    # Save results to file
-    os.makedirs('ai_crew/reports', exist_ok=True)
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    report_file = f'ai_crew/reports/analysis_{timestamp}.json'
-    
-    with open(report_file, 'w') as f:
-        json.dump(results, f, indent=2)
-    
-    print(f"Analysis complete. Report saved to {report_file}")
-    return results
+    try:
+        # Initialize the crew
+        crew = CodebaseAnalysisCrew(repo_path=args.repo_path)
+        
+        # Run the analysis
+        print("Running AI analysis crew...")
+        results = crew.kickoff()
+        
+        if not results:
+            print("Warning: No results returned from analysis crew")
+            return {}
+            
+        # Save results to file
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        results_dir = "analysis_results"
+        os.makedirs(results_dir, exist_ok=True)
+        results_file = os.path.join(results_dir, f"analysis_results_{timestamp}.json")
+        
+        with open(results_file, 'w', encoding='utf-8') as f:
+            json.dump(results, f, indent=2, ensure_ascii=False)
+        
+        print(f"Analysis complete. Results saved to {results_file}")
+        return results
+        
+    except Exception as e:
+        print(f"Error during analysis: {str(e)}", file=sys.stderr)
+        if hasattr(e, '__traceback__'):
+            import traceback
+            traceback.print_exc()
+        return {}
 
 def main():
     """Main function."""

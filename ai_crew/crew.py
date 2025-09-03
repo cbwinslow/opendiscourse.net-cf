@@ -1,9 +1,12 @@
 """
 CrewAI Configuration for Codebase Analysis and Improvement using Ollama
 """
-from typing import Dict, Any
+import os
+import json
+from datetime import datetime
+from typing import Dict, Any, List, Optional
 from crewai import Agent, Task, Crew, Process
-from langchain_community.llms import Ollama
+from langchain_community.llms.ollama import Ollama
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -14,11 +17,25 @@ class CodebaseAnalysisCrew:
     
     def __init__(self, repo_path: str):
         self.repo_path = repo_path
+        # Configure Ollama with the correct model path format
+        model_name = os.getenv("OLLAMA_MODEL", "qwen:7b")
+        base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+        
+        # Initialize Ollama with the correct parameters
+        # Note: The model name needs to be prefixed with 'ollama/' for the current version
         self.llm = Ollama(
-            model="qwen-coder",
+            model=f"ollama/{model_name}",
+            base_url=base_url,
             temperature=0.1,
-            base_url="http://localhost:11434"
+            top_p=0.9,
+            num_ctx=2048
         )
+        self.agents: Dict[str, Agent] = {}
+        self.tasks: Dict[str, Task] = {}
+        self.initialize_crew()
+    
+    def initialize_crew(self):
+        """Initialize agents and tasks."""
         self.agents = self._create_agents()
         self.tasks = self._create_tasks()
     
@@ -76,78 +93,103 @@ class CodebaseAnalysisCrew:
         }
     
     def _create_tasks(self) -> Dict[str, Task]:
-        """Create tasks for the agents."""
-        return {
-            "code_review": Task(
-                description="""
-                Analyze the codebase at {} and identify:
-                1. Potential bugs and issues
-                2. Code smells and anti-patterns
-                3. Security vulnerabilities
-                4. Performance bottlenecks
-                
-                Provide a detailed report with code examples and recommendations.
-                """.format(self.repo_path),
-                agent=self.agents["code_reviewer"],
-                expected_output="A detailed code review report with findings and recommendations."
-            ),
-            "documentation": Task(
-                description="""
-                Review the codebase at {} and:
-                1. Identify missing or outdated documentation
-                2. Create/update README files
-                3. Add docstrings to functions and classes
-                4. Create architecture diagrams if needed
-                """.format(self.repo_path),
-                agent=self.agents["documentation_specialist"],
-                expected_output="Updated documentation and docstrings throughout the codebase."
-            ),
-            "quality_assurance": Task(
-                description="""
-                Assess the quality of the codebase at {} by:
-                1. Analyzing test coverage
-                2. Identifying edge cases
-                3. Checking for error handling
-                4. Verifying coding standards compliance
-                """.format(self.repo_path),
-                agent=self.agents["quality_assurance"],
-                expected_output="A quality assessment report with test coverage metrics and recommendations."
-            ),
-            "improvement_proposal": Task(
-                description="""
-                Based on the findings from other agents, propose:
-                1. Architectural improvements
-                2. Performance optimizations
-                3. Technical debt reduction strategies
-                4. Future-proofing recommendations
-                """,
-                agent=self.agents["improvement_proposer"],
-                expected_output="A comprehensive improvement proposal with prioritized recommendations.",
-                context=[
-                    self.tasks["code_review"],
-                    self.tasks["documentation"],
-                    self.tasks["quality_assurance"]
-                ]
-            )
-        }
+        """Create and configure all tasks for the agents."""
+        # Initialize tasks dictionary
+        tasks = {}
+        
+        # Define tasks with dependencies
+        tasks["code_review"] = Task(
+            description=f"""
+            Perform a comprehensive code review of the repository at {self.repo_path}.
+            Look for bugs, security issues, code smells, and anti-patterns.
+            Focus on code quality, performance, and maintainability.
+            """,
+            agent=self.agents["code_reviewer"],
+            expected_output="A detailed code review report with findings and recommendations.",
+            output_file="code_review_report.md"
+        )
+        
+        tasks["documentation"] = Task(
+            description=f"""
+            Review and improve documentation for the codebase at {self.repo_path}.
+            Check for missing, outdated, or unclear documentation.
+            Ensure all public APIs are properly documented.
+            """,
+            agent=self.agents["documentation_specialist"],
+            expected_output="A documentation report with findings and suggested improvements.",
+            output_file="documentation_report.md",
+            context=[tasks["code_review"]]
+        )
+        
+        tasks["quality_assurance"] = Task(
+            description=f"""
+            Perform quality assurance checks on the codebase at {self.repo_path}.
+            Look for test coverage issues, flaky tests, and missing test cases.
+            Ensure code meets quality standards.
+            """,
+            agent=self.agents["quality_assurance"],
+            expected_output="A QA report with test coverage analysis and quality metrics.",
+            output_file="qa_report.md",
+            context=[tasks["code_review"]]
+        )
+        
+        tasks["improvement_proposals"] = Task(
+            description=f"""
+            Based on the code review, documentation, and QA reports,
+            create a set of improvement proposals for the codebase at {self.repo_path}.
+            Prioritize the proposals based on impact and effort.
+            """,
+            agent=self.agents["improvement_proposer"],
+            expected_output="A set of prioritized improvement proposals with implementation details.",
+            output_file="improvement_proposals.md",
+            context=[
+                tasks["code_review"],
+                tasks["documentation"],
+                tasks["quality_assurance"]
+            ]
+        )
+        
+        return tasks
     
     def kickoff(self) -> Dict[str, Any]:
         """Run the crew and return results."""
-        crew_instance = Crew(
-            agents=list(self.agents.values()),
-            tasks=list(self.tasks.values()),
-            verbose=2,
-            process=Process.sequential
-        )
-        
-        result = crew_instance.kickoff()
-        return {
-            "code_review": self.tasks["code_review"].output,
-            "documentation": self.tasks["documentation"].output,
-            "quality_assessment": self.tasks["quality_assurance"].output,
-            "improvement_proposal": self.tasks["improvement_proposal"].output,
-            "raw_result": result
-        }
+        try:
+            crew_instance = Crew(
+                agents=list(self.agents.values()),
+                tasks=list(self.tasks.values()),
+                verbose=True,
+                process=Process.sequential
+            )
+            
+            result = crew_instance.kickoff()
+            
+            # Prepare results
+            results = {
+                "timestamp": datetime.now().isoformat(),
+                "code_review": self.tasks["code_review"].output,
+                "documentation": self.tasks["documentation"].output,
+                "quality_assessment": self.tasks["quality_assurance"].output,
+                "improvement_proposal": self.tasks["improvement_proposal"].output,
+                "raw_result": str(result)
+            }
+            
+            # Save results to file
+            reviews_dir = os.path.join(self.repo_path, "ai_reviews")
+            os.makedirs(reviews_dir, exist_ok=True)
+            
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            output_file = os.path.join(reviews_dir, f"review_{timestamp}.json")
+            
+            with open(output_file, 'w', encoding='utf-8') as f:
+                json.dump(results, f, indent=2)
+            
+            print(f"\nReview saved to: {output_file}")
+            return results
+            
+        except Exception as e:
+            error_msg = f"Error in analysis crew: {str(e)}"
+            print(f"\n{error_msg}")
+            return {"status": "error", "error": error_msg}
 
 if __name__ == "__main__":
     crew = CodebaseAnalysisCrew(repo_path=".")

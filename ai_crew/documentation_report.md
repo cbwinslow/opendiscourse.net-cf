@@ -1,0 +1,1 @@
+Based on my conversation with the Technical Lead, the coding standards for your project are focused on maintainability, readability, and adherence to industry best practices. It's crucial that all team members follow these guidelines to ensure a consistent and high-quality codebase.
