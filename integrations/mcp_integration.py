@@ -70,6 +70,20 @@ class MCPClientWrapper:
         return {'stored': True, 'session_id': result.session_id}
 
     async def get_library_docs(self, library: str, query: str) -> Dict[str, Any]:
+        """
+        Retrieve example documentation snippets for a given library and query.
+        
+        If the Context7 subclient is disabled in this wrapper, returns {'error': 'context7_disabled'}.
+        Otherwise returns a dict with a 'snippets' key containing a list of snippet objects, each with
+        'title' (str) and 'code' (str) fields representing a short documentation example for the requested library.
+        
+        Parameters:
+            library (str): Name of the library to search snippets for.
+            query (str): Query or search terms (currently unused by the test wrapper).
+        
+        Returns:
+            Dict[str, Any]: Either an error dict or a dict containing 'snippets': List[Dict[str, str]].
+        """
         await asyncio.sleep(0)
         if not self._clients['context7']:
             return {'error': 'context7_disabled'}
@@ -80,6 +94,18 @@ class MCPClientWrapper:
         }
 
     async def search_cloudflare_docs(self, query: str) -> Dict[str, Any]:
+        """
+        Search Cloudflare documentation snippets (in-memory test stub).
+        
+        This async helper simulates a Cloudflare docs search for testing. If the Cloudflare subclient is disabled it returns an error dict; otherwise it returns a deterministic sample result.
+        
+        Parameters:
+            query (str): The search query string.
+        
+        Returns:
+            Dict[str, Any]: Either {'results': [{'title': str, 'url': str}, ...]} on success
+            or {'error': 'cloudflare_disabled'} if the Cloudflare subclient is disabled.
+        """
         await asyncio.sleep(0)
         if not self._clients['cloudflare']:
             return {'error': 'cloudflare_disabled'}
@@ -134,6 +160,19 @@ class MCPEnhancedAICrew:
 
     async def search_similar_analyses(self, query: str) -> List[AnalysisResult]:
         # naive search on recommendations
+        """
+        Return analysis results whose recommendations contain the given query substring.
+        
+        Performs a naive, case-sensitive substring search over each AnalysisResult.recommendations list.
+        If any recommendation string contains the query, the corresponding AnalysisResult is added once to
+        the returned list (preserves original order).
+        
+        Parameters:
+            query (str): Substring to search for within recommendation strings.
+        
+        Returns:
+            List[AnalysisResult]: Matching AnalysisResult objects in original order; empty list if none found.
+        """
         out: List[AnalysisResult] = []
         for r in self.analysis_history:
             for s in r.recommendations:
@@ -144,6 +183,19 @@ class MCPEnhancedAICrew:
 
 
 async def analyze_code_with_mcp_enhancement(code: str, analysis_type: str) -> AnalysisResult:
+    """
+    Convenience async helper that creates a default MCPEnhancedAICrew and runs a code analysis.
+    
+    This function instantiates an MCPEnhancedAICrew with a default MCPIntegrationConfig and delegates to its
+    analyze_code_with_mcp method.
+    
+    Parameters:
+        code (str): Source code or text to analyze. Empty or None-like strings are handled by the underlying crew.
+        analysis_type (str): Semantic label describing the kind of analysis to perform (e.g., "security", "style").
+    
+    Returns:
+        AnalysisResult: The analysis record produced by the crew.
+    """
     crew = MCPEnhancedAICrew(MCPIntegrationConfig())
     return await crew.analyze_code_with_mcp(code, analysis_type)
 

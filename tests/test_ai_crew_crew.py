@@ -7,6 +7,18 @@ from unittest.mock import MagicMock
 
 
 def make_dummy_agent(name):
+    """
+    Create a test double for an agent with a given name.
+    
+    This returns a MagicMock instance with its `name` attribute set to `name`.
+    Intended for use in tests that need a lightweight stand-in for an agent object.
+    
+    Parameters:
+        name (str): The name to assign to the dummy agent.
+    
+    Returns:
+        MagicMock: A MagicMock configured to represent an agent with the given name.
+    """
     a = MagicMock()
     a.name = name
     return a
@@ -28,10 +40,21 @@ def test_codebase_analysis_init_and_tasks(tmp_path, monkeypatch):
 
     class FakeCrew:
         def __init__(self, **kwargs):
+            """
+            Initialize the object by capturing provided agents and tasks.
+            
+            Accepts keyword arguments and stores the values for 'agents' and 'tasks' (if present) on the instance as self.agents and self.tasks.
+            """
             self.agents = kwargs.get('agents')
             self.tasks = kwargs.get('tasks')
 
         def kickoff(self):
+            """
+            Return a success result for kickoff.
+            
+            Returns:
+                dict: A result dictionary {'ok': True} indicating the kickoff completed successfully.
+            """
             return {'ok': True}
 
     monkeypatch.setattr('ai_crew.crew.Crew', FakeCrew)
@@ -70,6 +93,11 @@ def test_kickoff_handles_exceptions(tmp_path, monkeypatch):
 
     class BrokenCrew:
         def __init__(self, **kwargs):
+            """
+            Initialize the object.
+            
+            Accepts and silently ignores any keyword arguments; no attributes are set and no side effects occur.
+            """
             pass
 
         def kickoff(self):
