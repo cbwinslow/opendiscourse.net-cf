@@ -11,7 +11,7 @@ fi
 
 REPO="$1"
 
-read -rp "Enter CF_API_TOKEN: " CF_API_TOKEN
+read -rsp "Enter CF_API_TOKEN: " CF_API_TOKEN && echo
 read -rp "Enter CF_ACCOUNT_ID (optional): " CF_ACCOUNT_ID
 read -rp "Enter WORKER_ENV (optional): " WORKER_ENV
 
