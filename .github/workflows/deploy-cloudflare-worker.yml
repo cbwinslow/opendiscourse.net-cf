@@ -30,7 +30,7 @@ jobs:
 
       - name: Set outputs
         id: set-path
-        run: echo "::set-output name=build_path::cloudflare-container-worker"
+        run: echo "build_path=cloudflare-container-worker" >> $GITHUB_OUTPUT
 
   publish:
     needs: build
