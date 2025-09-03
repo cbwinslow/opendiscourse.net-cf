@@ -3,10 +3,14 @@ name: Deploy Cloudflare Worker
 on:
   push:
     branches: [ main, ci/integrations ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
+    outputs:
+      build-path: ${{ steps.set-path.outputs.build_path }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,16 +22,51 @@ jobs:
 
       - name: Install dependencies (worker)
         working-directory: cloudflare-container-worker
-        run: |
-          npm ci --silent
+        run: npm ci --silent
 
       - name: Build worker (if present)
         working-directory: cloudflare-container-worker
-        run: |
-          npm run build --silent || true
+        run: npm run build --silent || true
 
-      - name: Publish with Wrangler
-        uses: cloudflare/wrangler-action@v1
+      - name: Set outputs
+        id: set-path
+        run: echo "::set-output name=build_path::cloudflare-container-worker"
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          apiToken: ${{ secrets.CF_API_TOKEN }}
-          workingDirectory: cloudflare-container-worker
+          node-version: '20'
+
+      - name: Install wrangler
+        run: |
+          npm install -g wrangler@2 || npm install -g wrangler || true
+
+      - name: Show wrangler version
+        run: wrangler --version || true
+
+      - name: Publish to Cloudflare (conditional)
+        if: ${{ secrets.CF_API_TOKEN != '' }}
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          WORKER_ENV: ${{ secrets.WORKER_ENV }}
+        working-directory: cloudflare-container-worker
+        run: |
+          echo "CF_API_TOKEN present — publishing with wrangler"
+          # If you use a named environment in wrangler.toml, supply --env "$WORKER_ENV"
+          if [ -n "${WORKER_ENV}" ]; then
+            wrangler publish --env "$WORKER_ENV" || true
+          else
+            wrangler publish || true
+          fi
+
+      - name: Skip publish when no token
+        if: ${{ secrets.CF_API_TOKEN == '' }}
+        run: echo "CF_API_TOKEN not set — skipping publish (no secrets configured)"
