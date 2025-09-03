@@ -141,7 +141,7 @@ def create_github_pr(req: PullRequestRequest):
     gh_token = os.getenv("GITHUB_TOKEN")
     repo = os.getenv("GITHUB_REPO")
     if not (gh_token and repo):
-        _msg = "Would create PR '" + req.title + "' against " + (repo or "<repo>")
+        _msg = f"Would create PR '{req.title}' against " + (repo or "<repo>")
         return {"status": "simulated", "message": _msg}
 
     url = f"https://api.github.com/repos/{repo}/pulls"
