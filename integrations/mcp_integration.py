@@ -1,6 +1,6 @@
 from __future__ import annotations
 import asyncio
-from dataclasses import dataclass, asdict, field
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
@@ -73,7 +73,11 @@ class MCPClientWrapper:
         await asyncio.sleep(0)
         if not self._clients['context7']:
             return {'error': 'context7_disabled'}
-        return {'snippets': [{'title': f'{library} docs', 'code': 'def x(): pass'}]}
+        return {
+            'snippets': [
+                {'title': f'{library} docs', 'code': 'def x(): pass'},
+            ]
+        }
 
     async def search_cloudflare_docs(self, query: str) -> Dict[str, Any]:
         await asyncio.sleep(0)
@@ -130,7 +134,13 @@ class MCPEnhancedAICrew:
 
     async def search_similar_analyses(self, query: str) -> List[AnalysisResult]:
         # naive search on recommendations
-        return [r for r in self.analysis_history if any(query in (s or '') for s in r.recommendations)]
+        out: List[AnalysisResult] = []
+        for r in self.analysis_history:
+            for s in r.recommendations:
+                if s and query in s:
+                    out.append(r)
+                    break
+        return out
 
 
 async def analyze_code_with_mcp_enhancement(code: str, analysis_type: str) -> AnalysisResult:

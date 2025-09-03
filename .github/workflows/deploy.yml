@@ -1,3 +1,5 @@
+# Removed duplicate workflow block to avoid key collisions and ensure the remaining
+# "Deploy to Cloudflare" definition is parsed and executed correctly by GitHub Actions.
 name: Deploy to Cloudflare
 
 on:
