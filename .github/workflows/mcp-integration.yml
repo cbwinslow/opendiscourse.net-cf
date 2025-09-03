@@ -20,9 +20,14 @@ jobs:
         run: nohup python -m uvicorn mcp_server.app:app --host 127.0.0.1 --port 8080 &>/tmp/mcp.log &
       - name: Wait for MCP
         run: |
-          for i in `seq 1 10`; do
-            curl -sSf http://127.0.0.1:8080/health && break || sleep 1
+          for i in $(seq 1 10); do
+            if curl -sSf http://127.0.0.1:8080/health; then
+              exit 0
+            fi
+            sleep 1
           done
+          echo "MCP server failed to start within the expected time" >&2
+          exit 1
       - name: Create Jira issue via MCP (example)
         env:
           JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
