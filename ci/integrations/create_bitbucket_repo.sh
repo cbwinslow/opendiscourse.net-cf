@@ -11,6 +11,6 @@ if [ -z "${BITBUCKET_USERNAME:-}" ] || [ -z "${BITBUCKET_APP_PASSWORD:-}" ]; the
   exit 1
 fi
 
-repo_slug="$(basename $(pwd))"
+repo_slug="$(basename "$(pwd)")"
 echo "Would create repo ${repo_slug} in workspace ${BITBUCKET_WORKSPACE}."
 # Real implementation would call Bitbucket's API here (curl ...)
