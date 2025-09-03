@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
 # OpenDiscourse: Political Document Analyzer
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
