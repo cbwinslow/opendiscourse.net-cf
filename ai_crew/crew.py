@@ -163,13 +163,32 @@ class CodebaseAnalysisCrew:
             
             result = crew_instance.kickoff()
             
+            # Helper to ensure values are JSON-serializable
+            def _normalize(value):
+                try:
+                    # If json.dumps succeeds, keep the original object
+                    # (dict/list/etc.).
+                    json.dumps(value)
+                    return value
+                except Exception:
+                    return str(value)
+
             # Prepare results
             results = {
                 "timestamp": datetime.now().isoformat(),
-                "code_review": self.tasks["code_review"].output,
-                "documentation": self.tasks["documentation"].output,
-                "quality_assessment": self.tasks["quality_assurance"].output,
-                "improvement_proposal": self.tasks["improvement_proposal"].output,
+                "code_review": _normalize(
+                    getattr(self.tasks.get("code_review"), "output", None)
+                ),
+                "documentation": _normalize(
+                    getattr(self.tasks.get("documentation"), "output", None)
+                ),
+                "quality_assessment": _normalize(
+                    getattr(self.tasks.get("quality_assurance"), "output", None)
+                ),
+                # task key is 'improvement_proposals' in _create_tasks
+                "improvement_proposals": _normalize(
+                    getattr(self.tasks.get("improvement_proposals"), "output", None)
+                ),
                 "raw_result": str(result)
             }
             
@@ -190,6 +209,8 @@ class CodebaseAnalysisCrew:
             error_msg = f"Error in analysis crew: {str(e)}"
             print(f"\n{error_msg}")
             return {"status": "error", "error": error_msg}
+
+ 
 
 if __name__ == "__main__":
     crew = CodebaseAnalysisCrew(repo_path=".")

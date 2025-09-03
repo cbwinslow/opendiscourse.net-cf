@@ -3,7 +3,7 @@ import json
 import types
 from unittest.mock import MagicMock
 
-import pytest
+
 
 
 def make_dummy_agent(name):
@@ -35,8 +35,8 @@ def test_codebase_analysis_init_and_tasks(tmp_path, monkeypatch):
             return {'ok': True}
 
     monkeypatch.setattr('ai_crew.crew.Crew', FakeCrew)
-    # Process can be any sentinel
-    monkeypatch.setattr('ai_crew.crew.Process', object())
+    # Provide a Process object with a 'sequential' attribute used by Crew
+    monkeypatch.setattr('ai_crew.crew.Process', types.SimpleNamespace(sequential='sequential'))
 
     repo = tmp_path / "repo"
     repo.mkdir()

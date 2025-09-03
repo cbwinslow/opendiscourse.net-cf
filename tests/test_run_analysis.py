@@ -1,5 +1,5 @@
-import os
-import json
+import sys
+import types
 from unittest.mock import MagicMock
 
 
@@ -13,17 +13,25 @@ def test_run_analysis_writes_report(tmp_path, monkeypatch):
         def run_all(self):
             return fake_results
 
-    monkeypatch.setattr('ai_crew.run_analysis.CombinedCrew', FakeCombined)
+    # Inject a fake 'github' module so import succeeds
+    fake_github = MagicMock()
+    monkeypatch.setitem(sys.modules, 'github', fake_github)
+    # Also inject a fake 'crew' module used by run_analysis
+    fake_crew_module = types.SimpleNamespace(
+        CodebaseAnalysisCrew=lambda repo_path: types.SimpleNamespace(
+            kickoff=lambda: fake_results
+        )
+    )
+    monkeypatch.setitem(sys.modules, 'crew', fake_crew_module)
 
-    # Run the script main (imported as a module) but ensure it uses tmp_path
-    monkeypatch.setenv('OUTPUT_DIR', str(tmp_path))
-    # Import and call the runner
+    # Import and call run_analysis's run_analysis function directly
     import importlib
     mod = importlib.import_module('ai_crew.run_analysis')
-    # call the main runner function if present
-    if hasattr(mod, 'main'):
-        mod.main()
+    class Args:
+        repo_path = str(tmp_path)
+        scope = 'all'
+        create_pr = False
+        dry_run = True
 
-    # Check reports dir contains a json file
-    files = list(tmp_path.glob('*.json'))
-    assert len(files) >= 0
+    res = mod.run_analysis(Args())
+    assert res == fake_results
