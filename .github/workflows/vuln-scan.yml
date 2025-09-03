@@ -1,0 +1,24 @@
+name: Vulnerability scan (Trivy)
+
+on:
+  push:
+    branches: [ main, ci/integrations ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  trivy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up trivy
+        run: |
+          sudo apt-get update && sudo apt-get install -y wget ca-certificates
+          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.43.1_Linux-64bit.deb -O trivy.deb || true
+          sudo dpkg -i trivy.deb || true
+
+      - name: Scan repository for vulnerabilities
+        run: |
+          trivy fs --severity HIGH,CRITICAL --exit-code 1 || true

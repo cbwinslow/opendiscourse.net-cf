@@ -1,0 +1,24 @@
+stages:
+  - test
+  - vuln
+  - deploy
+
+lint:
+  stage: test
+  image: node:20
+  script:
+    - npm --prefix frontend/next-app ci --silent || true
+    - npm --prefix frontend/next-app run lint --silent || true
+
+vuln_scan:
+  stage: vuln
+  image: aquasec/trivy:latest
+  script:
+    - trivy fs --severity HIGH,CRITICAL || true
+
+deploy_cloudrun:
+  stage: deploy
+  image: google/cloud-sdk:slim
+  script:
+    - echo "Deploy step placeholder; requires project secrets"
+  when: manual

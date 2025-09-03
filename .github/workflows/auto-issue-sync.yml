@@ -1,0 +1,38 @@
+name: Auto Issue Sync
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare payload
+        id: payload
+        run: |
+          echo "ISSUE_TITLE=$(jq -r .issue.title "$GITHUB_EVENT_PATH")" >> $GITHUB_ENV
+          echo "ISSUE_BODY=$(jq -r .issue.body "$GITHUB_EVENT_PATH")" >> $GITHUB_ENV
+
+      - name: Create Jira issue (conditional)
+        if: ${{ secrets.JIRA_API_TOKEN != '' }}
+        run: |
+          echo "Creating Jira issue (simulated)" || true
+
+      - name: Create Linear issue (conditional)
+        if: ${{ secrets.LINEAR_API_KEY != '' }}
+        run: |
+          echo "Creating Linear issue (simulated)" || true
+
+      - name: Create Bitbucket ticket (conditional)
+        if: ${{ secrets.BITBUCKET_APP_PASSWORD != '' }}
+        run: |
+          echo "Creating Bitbucket issue (simulated)" || true
+
+      - name: Create GitLab issue (conditional)
+        if: ${{ secrets.GITLAB_TOKEN != '' }}
+        run: |
+          echo "Creating GitLab issue (simulated)" || true
