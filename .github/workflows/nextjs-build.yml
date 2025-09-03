@@ -1,0 +1,27 @@
+name: Frontend Build
+
+on:
+  push:
+    paths:
+      - 'frontend/next-app/**'
+  pull_request:
+    paths:
+      - 'frontend/next-app/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install deps
+        run: |
+          cd frontend/next-app
+          npm ci
+      - name: Build
+        run: |
+          cd frontend/next-app
+          npm run build

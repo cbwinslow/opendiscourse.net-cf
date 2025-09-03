@@ -127,3 +127,35 @@ def create_linear_issue(req: IssueRequest):
     if resp.status_code != 200:
         raise HTTPException(status_code=resp.status_code, detail=resp.text)
     return resp.json()
+
+
+class PullRequestRequest(BaseModel):
+    title: str
+    head: str
+    base: str = "main"
+    body: str = ""
+
+
+@app.post("/github/pull-requests")
+def create_github_pr(req: PullRequestRequest):
+    gh_token = os.getenv("GITHUB_TOKEN")
+    repo = os.getenv("GITHUB_REPO")
+    if not (gh_token and repo):
+        _msg = "Would create PR '" + req.title + "' against " + (repo or "<repo>")
+        return {"status": "simulated", "message": _msg}
+
+    url = f"https://api.github.com/repos/{repo}/pulls"
+    headers = {
+        "Authorization": f"token {gh_token}",
+        "Accept": "application/vnd.github.v3+json",
+    }
+    payload = {
+        "title": req.title,
+        "head": req.head,
+        "base": req.base,
+        "body": req.body,
+    }
+    resp = requests.post(url, headers=headers, json=payload)
+    if resp.status_code not in (200, 201):
+        raise HTTPException(status_code=resp.status_code, detail=resp.text)
+    return resp.json()
