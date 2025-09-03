@@ -3,9 +3,6 @@ import json
 import types
 from unittest.mock import MagicMock
 
-
-
-
 def make_dummy_agent(name):
     a = MagicMock()
     a.name = name
