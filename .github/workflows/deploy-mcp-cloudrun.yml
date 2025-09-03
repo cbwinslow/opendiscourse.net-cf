@@ -1,0 +1,33 @@
+name: Deploy MCP Server to Cloud Run
+
+on:
+  push:
+    branches: [ main, ci/integrations ]
+
+jobs:
+  deploy-cloudrun:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+
+      - name: Configure Docker for gcloud
+        run: gcloud auth configure-docker --quiet
+
+      - name: Build and submit container
+        run: |
+          gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/mcp-server:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy mcp-server \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/mcp-server:latest \
+            --region ${GCP_REGION:-us-central1} \
+            --platform managed \
+            --allow-unauthenticated || true

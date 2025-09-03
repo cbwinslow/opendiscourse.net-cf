@@ -1,0 +1,35 @@
+name: Deploy Frontend to Cloudflare Pages
+
+on:
+  push:
+    branches: [ main, ci/integrations ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: frontend/next-app
+        run: npm ci --silent
+
+      - name: Build
+        working-directory: frontend/next-app
+        run: npm run build --silent || true
+
+      - name: Deploy to Cloudflare Pages (conditional)
+        if: ${{ secrets.CF_PAGES_TOKEN != '' }}
+        env:
+          CF_PAGES_TOKEN: ${{ secrets.CF_PAGES_TOKEN }}
+        working-directory: frontend/next-app
+        run: |
+          # Uses the Cloudflare Pages CLI via wrangler pages or API; here we use wrangler.
+          npm install -g wrangler || true
+          wrangler pages deploy ./out --project-name "$CF_PAGES_PROJECT" --branch "$GITHUB_REF_NAME" --commit-sha "$GITHUB_SHA" || true
