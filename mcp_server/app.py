@@ -155,7 +155,7 @@ def create_github_pr(req: PullRequestRequest):
         "base": req.base,
         "body": req.body,
     }
-    resp = requests.post(url, headers=headers, json=payload)
+    resp = requests.post(url, headers=headers, json=payload, timeout=30)
     if resp.status_code not in (200, 201):
         raise HTTPException(status_code=resp.status_code, detail=resp.text)
     return resp.json()
