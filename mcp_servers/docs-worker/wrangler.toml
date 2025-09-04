@@ -1,0 +1,38 @@
+name = "docs-mcp-worker"
+main = "src/index.ts"
+compatibility_date = "2025-08-28"
+compatibility_flags = ["nodejs_compat"]
+
+# AI binding
+[ai]
+binding = "AI"
+
+# D1 Database for document metadata
+[[d1_databases]]
+binding = "DB"
+database_name = "documents-db"
+database_id = "documents-db-id"
+
+# R2 Bucket for document storage
+[[r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "opendiscourse-documents"
+
+# Vectorize for document search
+[[vectorize]]
+binding = "VECTOR_INDEX"
+index_name = "documents-vector-index"
+
+# KV for caching
+[[kv_namespaces]]
+binding = "CACHE"
+id = "docs-cache-id"
+
+# Environment routes
+[env.production]
+name = "docs-mcp-prod"
+route = "docs.opendiscourse.net/*"
+
+[env.staging]
+name = "docs-mcp-staging"
+route = "docs-staging.opendiscourse.net/*"

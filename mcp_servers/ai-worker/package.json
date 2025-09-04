@@ -1,0 +1,21 @@
+{
+  "name": "ai-mcp-worker",
+  "version": "1.0.0",
+  "description": "AI/ML MCP Server for OpenDiscourse.net - Code analysis, documentation, and political analysis",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "build": "wrangler deploy --dry-run"
+  },
+  "dependencies": {
+    "@cloudflare/workers-types": "^4.20231218.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": ["mcp", "ai", "cloudflare", "workers", "opendiscourse"],
+  "author": "OpenDiscourse Team",
+  "license": "MIT"
+}

@@ -1,0 +1,21 @@
+{
+  "name": "db-mcp-worker",
+  "version": "1.0.0",
+  "description": "Database MCP Server for OpenDiscourse.net - Database operations, queries, and data management",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "build": "wrangler deploy --dry-run"
+  },
+  "dependencies": {
+    "@cloudflare/workers-types": "^4.20231218.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": ["mcp", "database", "d1", "cloudflare", "opendiscourse"],
+  "author": "OpenDiscourse Team",
+  "license": "MIT"
+}

@@ -1,0 +1,37 @@
+name = "cache-mcp-worker"
+main = "src/index.ts"
+compatibility_date = "2025-08-28"
+compatibility_flags = ["nodejs_compat"]
+
+# AI binding
+[ai]
+binding = "AI"
+
+# D1 Database for cache metadata
+[[d1_databases]]
+binding = "DB"
+database_name = "cache-metadata-db"
+database_id = "cache-metadata-db-id"
+
+# KV for main caching
+[[kv_namespaces]]
+binding = "CACHE"
+id = "cache-kv-id"
+
+# Queues for analytics and notifications
+[[queues.producers]]
+binding = "ANALYTICS_QUEUE"
+queue = "opendiscourse-analytics"
+
+[[queues.producers]]
+binding = "NOTIFICATION_QUEUE"
+queue = "opendiscourse-notifications"
+
+# Environment routes
+[env.production]
+name = "cache-mcp-prod"
+route = "cache.opendiscourse.net/*"
+
+[env.staging]
+name = "cache-mcp-staging"
+route = "cache-staging.opendiscourse.net/*"

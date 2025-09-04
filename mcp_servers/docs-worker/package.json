@@ -1,0 +1,21 @@
+{
+  "name": "docs-mcp-worker",
+  "version": "1.0.0",
+  "description": "Document Processing MCP Server for OpenDiscourse.net - Document storage, OCR, PDF processing, and search",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "build": "wrangler deploy --dry-run"
+  },
+  "dependencies": {
+    "@cloudflare/workers-types": "^4.20231218.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": ["mcp", "documents", "ocr", "pdf", "cloudflare", "opendiscourse"],
+  "author": "OpenDiscourse Team",
+  "license": "MIT"
+}

@@ -1,0 +1,17 @@
+name: crew-agentless
+description: "Agentless mode: relies on direct pipeline calls rather than orchestrated agents."
+services:
+  llm:
+    provider_preference: [openai]
+    model: gpt-4o
+  transcription:
+    provider: openai
+workers:
+  count: 0
+capabilities:
+  - ingest
+  - transcribe
+  - normalize
+notes: |
+  Agentless mode disables background agents and instead exposes a small API for direct pipeline invocation.
+  Useful for integrating with other orchestrators or for serverless deployments where long-lived agents aren't desired.

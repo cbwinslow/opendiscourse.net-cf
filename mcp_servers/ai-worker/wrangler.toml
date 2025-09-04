@@ -1,0 +1,33 @@
+name = "ai-mcp-worker"
+main = "src/index.ts"
+compatibility_date = "2025-08-28"
+compatibility_flags = ["nodejs_compat"]
+
+# AI binding
+[ai]
+binding = "AI"
+
+# D1 Database for storing analyses
+[[d1_databases]]
+binding = "DB"
+database_name = "ai-analyses-db"
+database_id = "ai-analyses-db-id"
+
+# Vectorize for embeddings
+[[vectorize]]
+binding = "VECTOR_INDEX"
+index_name = "ai-vector-index"
+
+# KV for caching
+[[kv_namespaces]]
+binding = "CACHE"
+id = "ai-cache-id"
+
+# Environment routes
+[env.production]
+name = "ai-mcp-prod"
+route = "ai.opendiscourse.net/*"
+
+[env.staging]
+name = "ai-mcp-staging"
+route = "ai-staging.opendiscourse.net/*"

@@ -1,0 +1,22 @@
+name: crew-medium
+description: "Balanced crew configuration for small teams and staging environments."
+services:
+  llm:
+    provider_preference: [azure_openai, openai, ollama]
+    model: gpt-4o
+  transcription:
+    provider: openai
+workers:
+  count: 3
+  resources:
+    cpu: 1
+    memory: 1024MB
+capabilities:
+  - ingest
+  - transcribe
+  - normalize
+  - metrics
+notes: |
+  This config aims to balance cost and throughput for staging environments. It prefers managed cloud
+  providers when credentials are available and falls back to Ollama only if no cloud credentials exist.
+

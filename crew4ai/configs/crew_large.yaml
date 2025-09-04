@@ -1,0 +1,22 @@
+name: crew-large
+description: "Production-like configuration for heavy ingestion and batch processing."
+services:
+  llm:
+    provider_preference: [azure_openai, openai]
+    model: gpt-4o-large
+  transcription:
+    provider: openai
+workers:
+  count: 8
+  resources:
+    cpu: 2
+    memory: 4096MB
+capabilities:
+  - ingest
+  - transcribe
+  - normalize
+  - metrics
+  - reporting
+notes: |
+  Use this config for heavy throughput workloads. Requires cloud provider credentials and sufficient
+  infra (k8s or cloud run with autoscaling). Not suitable for laptop usage.

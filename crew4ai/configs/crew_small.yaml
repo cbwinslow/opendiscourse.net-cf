@@ -1,0 +1,20 @@
+name: crew-small
+description: "Minimal crew configuration for local experiments and quick prototyping."
+services:
+  llm:
+    provider_preference: [openai, ollama]
+    model: gpt-4o-mini
+  transcription:
+    provider: openai
+workers:
+  count: 1
+  resources:
+    cpu: 0.5
+    memory: 512MB
+capabilities:
+  - ingest
+  - transcribe
+  - normalize
+notes: |
+  This config is intended for local dev and CI-level smoke runs. It keeps resource use small
+  and selects cloud providers when credentials are available, otherwise falls back to local services.

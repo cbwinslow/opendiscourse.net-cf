@@ -1,0 +1,71 @@
+name: crew4ai container build & scan
+
+on:
+  push: {}
+  pull_request: {}
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+      - name: Build image
+        run: |
+          docker build --file crew4ai/Dockerfile.slim --tag crew4ai:ci .
+      - name: Install syft
+        run: |
+          set -eux
+          mkdir -p tmp
+          # install syft (anchore) into /usr/local/bin
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sudo sh -s -- -b /usr/local/bin v0.74.0 || true
+          syft --version || true
+      - name: Generate SBOM (syft CLI)
+        run: |
+          set -eux
+          mkdir -p tmp
+          if command -v syft >/dev/null 2>&1; then
+            syft crew4ai:ci -o json > tmp/sbom.json
+          else
+            echo "syft not available"
+            exit 1
+          fi
+      - name: Trivy scan
+        id: trivy
+        uses: aquasecurity/trivy-action@v1
+        with:
+          image-ref: crew4ai:ci
+          format: json
+          output: tmp/trivy-report.json
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+      - name: Install grype
+        run: |
+          set -eux
+          curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sudo sh -s -- -b /usr/local/bin v0.65.1 || true
+          grype --version || true
+      - name: Run grype scan (from SBOM)
+        run: |
+          set -eux
+          if command -v grype >/dev/null 2>&1 && [ -f tmp/sbom.json ]; then
+            grype sbom:tmp/sbom.json -o json > tmp/grype-report.json || true
+          else
+            echo "grype or sbom not available"
+            exit 1
+          fi
+      - name: Smoke-test container
+        run: |
+          docker run --rm crew4ai:ci python -c "print('container-smoke-ok')"
+      - name: Upload scan artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: crew4ai-scan-reports
+          path: tmp/

@@ -1,0 +1,33 @@
+name = "db-mcp-worker"
+main = "src/index.ts"
+compatibility_date = "2025-08-28"
+compatibility_flags = ["nodejs_compat"]
+
+# AI binding
+[ai]
+binding = "AI"
+
+# D1 Database for main data storage
+[[d1_databases]]
+binding = "DB"
+database_name = "opendiscourse-main-db"
+database_id = "main-db-id"
+
+# Vectorize for semantic search
+[[vectorize]]
+binding = "VECTOR_INDEX"
+index_name = "db-vector-index"
+
+# KV for caching query results
+[[kv_namespaces]]
+binding = "CACHE"
+id = "db-cache-id"
+
+# Environment routes
+[env.production]
+name = "db-mcp-prod"
+route = "db.opendiscourse.net/*"
+
+[env.staging]
+name = "db-mcp-staging"
+route = "db-staging.opendiscourse.net/*"
