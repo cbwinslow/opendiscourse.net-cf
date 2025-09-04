@@ -365,6 +365,27 @@ Entities are automatically extracted during document ingestion. You can also man
 npm run dev
 ```
 
+### Poetry support
+
+This repository includes a minimal `pyproject.toml` so you can build and publish the Python packaging artifacts with Poetry.
+
+Install Poetry:
+
+```bash
+curl -sSL https://install.python-poetry.org | python -
+```
+
+Build the package (wheel + sdist):
+
+```bash
+poetry build
+```
+
+Publish to PyPI via GitHub Actions:
+
+1. Add `PYPI_API_TOKEN` to repository secrets (create the token in your PyPI account).
+2. Create an annotated tag and push it, e.g. `git tag -a v0.1.0 -m "release" && git push origin v0.1.0`.
+
 ### Deployment
 
 ```bash
