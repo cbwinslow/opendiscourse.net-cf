@@ -8,9 +8,21 @@ def test_run_analysis_writes_report(tmp_path, monkeypatch):
     fake_results = {'summary': 'ok', 'details': []}
     class FakeCombined:
         def __init__(self, config=None):
+            """
+            Initialize a FakeCombined test stub.
+            
+            Parameters:
+                config (optional): Configuration accepted for API compatibility; not used by this stub.
+            """
             pass
 
         def run_all(self):
+            """
+            Return a deterministic analysis result used by tests.
+            
+            Returns:
+                dict: The predefined fake results (e.g., {'summary': 'ok', 'details': []}).
+            """
             return fake_results
 
     # Inject a fake 'github' module so import succeeds

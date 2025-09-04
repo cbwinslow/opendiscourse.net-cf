@@ -24,6 +24,17 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '../../.env'))
 
 class TestInfrastructure:
     def __init__(self):
+        """
+        Initialize TestInfrastructure instance.
+        
+        Creates attributes used to hold external connections/clients and sets them to None:
+        - pg_conn: PostgreSQL connection
+        - ch_conn: (unused/placeholder) channel/connection for message broker testing
+        - rabbit_conn: RabbitMQ connection
+        - rabbit_channel: RabbitMQ channel
+        
+        These are populated by the corresponding connect_* methods when tests run.
+        """
         self.pg_conn = None
         self.ch_conn = None
         self.rabbit_conn = None
