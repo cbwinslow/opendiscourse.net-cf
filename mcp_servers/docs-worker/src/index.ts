@@ -76,7 +76,7 @@ async function handleDocumentUpload(
       });
     }
 
-    const fileId = `doc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const fileId = `doc_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     const fileKey = `${fileId}/${file.name}`;
 
     // Upload to R2

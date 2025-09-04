@@ -103,7 +103,7 @@ async function handleCreateTenant(
       });
     }
 
-    const tenantId = `tenant_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const tenantId = `tenant_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 
     await env.DB.prepare(
       `INSERT INTO tenants (id, name, domain, settings, created_at, active)
