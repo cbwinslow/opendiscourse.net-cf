@@ -1,17 +1,17 @@
 // GovInfo BulkData Processor for AutoRAG
 // Handles processing of bulkdata from govinfo.gov
 
-import { existsSync, mkdirSync, writeFileSync, promises as fs } from 'fs';
-import { join, basename, dirname } from 'path';
-import fetch from 'node-fetch';
-import { createGunzip } from 'zlib';
-import { pipeline } from 'stream/promises';
-import { createWriteStream, createReadStream } from 'fs';
-import { extract } from 'tar';
-import { promisify } from 'util';
-import stream from 'stream';
-import { Worker, isMainThread, parentPort, workerData } from 'worker_threads';
-import os from 'os';
+import { existsSync, mkdirSync, writeFileSync, promises as fs } from "fs";
+import { join, basename, dirname } from "path";
+import fetch from "node-fetch";
+import { createGunzip } from "zlib";
+import { pipeline } from "stream/promises";
+import { createWriteStream, createReadStream } from "fs";
+import { extract } from "tar";
+import { promisify } from "util";
+import stream from "stream";
+import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
+import os from "os";
 
 const pipelineAsync = promisify(stream.pipeline);
 const CPU_COUNT = os.cpus().length;
@@ -47,9 +47,10 @@ export class GovInfoBulkDataProcessor {
   private processedFiles: Map<string, boolean> = new Map();
 
   constructor(config: any) {
+    console.log("DEBUG: GovInfoBulkDataProcessor constructor called.");
     this.config = config.govinfo;
-    this.baseUrl = this.config.bulkDataUrl || 'https://www.govinfo.gov/bulkdata';
-    this.downloadDir = this.config.downloadDir || join(process.cwd(), 'data', 'govinfo', 'bulkdata');
+    this.baseUrl = this.config.bulkDataUrl || "https://www.govinfo.gov/bulkdata";
+    this.downloadDir = this.config.downloadDir || join(process.cwd(), "data", "govinfo", "bulkdata");
     
     // Ensure download directory exists
     this.ensureDirectoryExists(this.downloadDir);
@@ -68,10 +69,10 @@ export class GovInfoBulkDataProcessor {
   private async processInParallel<T, R>(
     items: T[],
     workerPath: string,
-    workerCount = Math.min(CPU_COUNT, items.length)
+    workerCount = Math.min(CPU_COUNT, items.length),
   ): Promise<R[]> {
     if (!isMainThread) {
-      throw new Error('This method should only be called from the main thread');
+      throw new Error("This method should only be called from the main thread");
     }
     
     const chunkSize = Math.ceil(items.length / workerCount);
@@ -81,29 +82,29 @@ export class GovInfoBulkDataProcessor {
       chunks.push(items.slice(i, i + chunkSize));
     }
     
-    const workers = chunks.map(chunk => 
-      new Promise<R[]>((resolve, reject) => {
+    const workers = chunks.map((chunk) => {
+      return new Promise<R[]>((resolve, reject) => {
         const worker = new Worker(workerPath, {
           workerData: chunk,
-          execArgv: ['--max-old-space-size=4096']
+          execArgv: ["--max-old-space-size=4096"],
         });
         
         const results: R[] = [];
         
-        worker.on('message', (result: R) => {
+        worker.on("message", (result: R) => {
           results.push(result);
         });
         
-        worker.on('error', reject);
-        worker.on('exit', (code) => {
+        worker.on("error", reject);
+        worker.on("exit", (code) => {
           if (code === 0) {
             resolve(results);
           } else {
             reject(new Error(`Worker stopped with exit code ${code}`));
           }
         });
-      })
-    );
+      });
+    });
     
     const results = await Promise.all(workers);
     return results.flat();
@@ -111,14 +112,26 @@ export class GovInfoBulkDataProcessor {
 
   // Get available bulkdata collections
   async getAvailableCollections(): Promise<string[]> {
-    return this.config.collections || [
-      'BILLS', 'PLAW', 'STATUTE', 'FR', 'CFR', 'USCODE',
-      'CREC', 'CHRG', 'ECONI', 'CDIR', 'CDOC', 'CPRT'
-    ];
+    console.log("DEBUG: getAvailableCollections called.");
+    return (this.config.collections || [
+      "BILLS", 
+      "PLAW", 
+      "STATUTE", 
+      "FR", 
+      "CFR", 
+      "USCODE",
+      "CREC", 
+      "CHRG", 
+      "ECONI", 
+      "CDIR", 
+      "CDOC", 
+      "CPRT"
+    ]);
   }
 
   // List bulkdata files for a collection
   async listBulkDataFiles(collection: string, year?: number): Promise<BulkDataCollection[]> {
+    console.log(`DEBUG: listBulkDataFiles called for collection: ${collection}${year ? ` (${year})` : ''}`);
     try {
       console.log(`Fetching bulkdata files for collection: ${collection}${year ? ` (${year})` : ''}`);
       
@@ -134,6 +147,7 @@ export class GovInfoBulkDataProcessor {
   
   // Download a file with retry logic
   private async downloadFile(url: string, destination: string): Promise<void> {
+    console.log(`DEBUG: downloadFile called for url: ${url}`);
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), this.config.ingestion.timeout || 30000);
     
@@ -151,7 +165,7 @@ export class GovInfoBulkDataProcessor {
       await fs.mkdir(dirname(destination), { recursive: true });
       
       const fileStream = createWriteStream(destination, { highWaterMark: 1024 * 1024 });
-      await pipelineAsync(response.body, fileStream);
+      await pipelineAsync(response.body as any, fileStream);
       
     } catch (error) {
       // Clean up partially downloaded file
@@ -176,6 +190,7 @@ export class GovInfoBulkDataProcessor {
   
   // Process a single bulk data file
   async processBulkDataFile(file: BulkDataCollection): Promise<ProcessedFile> {
+    console.log(`DEBUG: processBulkDataFile called for file: ${file.downloadUrl}`);
     const fileName = file.downloadUrl.split('/').pop() || 'unknown';
     const filePath = join(this.downloadDir, fileName);
     
@@ -230,6 +245,7 @@ export class GovInfoBulkDataProcessor {
   
   // Process a single file (XML, JSON, etc.)
   private async processSingleFile(filePath: string, fileInfo: BulkDataCollection): Promise<ProcessedFile> {
+    console.log(`DEBUG: processSingleFile called for filePath: ${filePath}`);
     console.log(`Processing file: ${filePath}`);
     
     // In a real implementation, you would parse the file based on its type
@@ -278,7 +294,7 @@ export class GovInfoBulkDataProcessor {
       const congress = 117; // Current Congress
       const billTypes = ['hr', 's', 'hjres', 'sjres', 'hconres', 'sconres', 'hres', 'sres'];
       
-      billTypes.forEach(type => {
+      billTypes.forEach((type) => {
         files.push({
           collection,
           publishedAt: new Date().toISOString(),
@@ -323,6 +339,7 @@ export class GovInfoBulkDataProcessor {
 
   // Process all bulkdata for a collection
   async processCollectionBulkData(collection: string, limit: number = 100): Promise<void> {
+    console.log(`DEBUG: processCollectionBulkData called for collection: ${collection}`);
     try {
       console.log(`Processing bulkdata for collection: ${collection}`);
       
@@ -334,22 +351,21 @@ export class GovInfoBulkDataProcessor {
       for (let i = 0; i < files.length; i += batchSize) {
         const batch = files.slice(i, i + batchSize);
         await Promise.all(
-          batch.map(file => 
-            this.processWithRetry(() => this.processFile(file.downloadUrl))
-              .catch(error => {
+          batch.map((file) => {
+            return this.processWithRetry(() => this.processFile(file.downloadUrl))
+              .catch((error: any) => {
                 console.error(`Error processing ${file.downloadUrl}:`, error);
                 return null;
-              })
-          )
+              });
+          })
         );
         
         // Small delay between batches to prevent overwhelming the system
         await new Promise(resolve => setTimeout(resolve, 100));
-          console.error(`Failed to process file ${fileInfo.title}:`, error);
-        }
+        
       }
       
-      console.log(`Finished processing ${processLimit} files for collection: ${collection}`);
+      console.log(`Finished processing files for collection: ${collection}`);
     } catch (error) {
       console.error(`Error processing bulkdata for collection ${collection}:`, error);
       throw error;
@@ -358,6 +374,7 @@ export class GovInfoBulkDataProcessor {
 
   // Process bulkdata for all collections
   async processAllCollectionsBulkData(limitPerCollection: number = 100): Promise<void> {
+    console.log("DEBUG: processAllCollectionsBulkData called");
     try {
       console.log("Processing bulkdata for all collections");
       
@@ -368,9 +385,9 @@ export class GovInfoBulkDataProcessor {
       // Process collections with limited concurrency
       for (let i = 0; i < collections.length; i += concurrentCollections) {
         const batch = collections.slice(i, i + concurrentCollections);
-        const promises = batch.map(collection => 
-          this.processCollectionBulkData(collection, limitPerCollection)
-        );
+        const promises = batch.map((collection) => {
+          return this.processCollectionBulkData(collection, limitPerCollection);
+        });
         
         try {
           await Promise.all(promises);
