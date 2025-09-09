@@ -13,27 +13,22 @@
     "logs": "wrangler tail",
     "logs:prod": "wrangler tail --env production",
     "logs:staging": "wrangler tail --env staging",
-    
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "typecheck": "tsc --noEmit",
     "check": "npm run lint && npm run typecheck && npm test",
-    
     "setup": "npx tsx scripts/setup/init-cloudflare.ts",
     "setup:dev": "./scripts/setup-dev.sh",
     "db:migrate": "wrangler d1 migrations apply opendiscourse-db --local",
     "db:migrate:prod": "wrangler d1 migrations apply opendiscourse-db --remote",
     "db:studio": "npx prisma studio",
-    
     "ingest:govinfo": "npx ts-node ingestion/scripts/ingestion.ts govinfo",
     "ingest:all": "npx ts-node ingestion/scripts/ingestion.ts all",
     "ingest:test": "npx ts-node ingestion/scripts/test_ingestion.ts",
-    
     "docs:api": "npx @redocly/cli build-docs openapi.yaml --output docs/api.html",
     "docs:serve": "npx http-server docs -p 8080"
   },
@@ -57,7 +52,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250828.0",
+    "@cloudflare/workers-types": "^4.20250909.0",
     "@typescript-eslint/eslint-plugin": "^7.3.1",
     "@typescript-eslint/parser": "^7.3.1",
     "eslint": "^8.57.0",
