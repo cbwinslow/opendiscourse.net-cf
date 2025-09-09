@@ -51,11 +51,9 @@ export class CongressIngestion {
     const url = `${this.baseUrl}/bill?api_key=${this.config.apiKey}&offset=${offset}&limit=${pageSize}`;
     console.log(`Fetching bills from ${url}`);
 
-<<<<<<< HEAD
     const result = await IngestionUtils.fetchWithRateLimit(url, undefined, 3, 30000);
     if (!result.success) {
       throw IngestionUtils.handleError(result.error, 'fetchBills');
-=======
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -65,7 +63,6 @@ export class CongressIngestion {
     } catch (error) {
       console.error(`Error fetching bills:`, error);
       throw error;
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
     }
 
     return result.data;
@@ -76,11 +73,9 @@ export class CongressIngestion {
     const url = `${this.baseUrl}/bill/${billId}?api_key=${this.config.apiKey}`;
     console.log(`Fetching bill details for ${billId} from ${url}`);
 
-<<<<<<< HEAD
     const result = await IngestionUtils.fetchWithRateLimit(url, undefined, 3, 30000);
     if (!result.success) {
       throw IngestionUtils.handleError(result.error, `fetchBillDetails-${billId}`);
-=======
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -90,7 +85,6 @@ export class CongressIngestion {
     } catch (error) {
       console.error(`Error fetching bill details for ${billId}:`, error);
       throw error;
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
     }
 
     return result.data;
@@ -101,11 +95,9 @@ export class CongressIngestion {
     const url = `${this.baseUrl}/bill/${billId}/subjects?api_key=${this.config.apiKey}`;
     console.log(`Fetching bill subjects for ${billId} from ${url}`);
 
-<<<<<<< HEAD
     const result = await IngestionUtils.fetchWithRateLimit(url, undefined, 3, 30000);
     if (!result.success) {
       throw IngestionUtils.handleError(result.error, `fetchBillSubjects-${billId}`);
-=======
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -115,7 +107,6 @@ export class CongressIngestion {
     } catch (error) {
       console.error(`Error fetching bill subjects for ${billId}:`, error);
       throw error;
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
     }
 
     return result.data;
@@ -126,11 +117,9 @@ export class CongressIngestion {
     const url = `${this.baseUrl}/bill/${billId}/summaries?api_key=${this.config.apiKey}`;
     console.log(`Fetching bill summaries for ${billId} from ${url}`);
 
-<<<<<<< HEAD
     const result = await IngestionUtils.fetchWithRateLimit(url, undefined, 3, 30000);
     if (!result.success) {
       throw IngestionUtils.handleError(result.error, `fetchBillSummaries-${billId}`);
-=======
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -140,7 +129,6 @@ export class CongressIngestion {
     } catch (error) {
       console.error(`Error fetching bill summaries for ${billId}:`, error);
       throw error;
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
     }
 
     return result.data;
@@ -151,11 +139,9 @@ export class CongressIngestion {
     const url = `${this.baseUrl}/bill/${billId}/actions?api_key=${this.config.apiKey}`;
     console.log(`Fetching bill actions for ${billId} from ${url}`);
 
-<<<<<<< HEAD
     const result = await IngestionUtils.fetchWithRateLimit(url, undefined, 3, 30000);
     if (!result.success) {
       throw IngestionUtils.handleError(result.error, `fetchBillActions-${billId}`);
-=======
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -165,7 +151,6 @@ export class CongressIngestion {
     } catch (error) {
       console.error(`Error fetching bill actions for ${billId}:`, error);
       throw error;
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
     }
 
     return result.data;
@@ -176,11 +161,9 @@ export class CongressIngestion {
     const url = `${this.baseUrl}/bill/${billId}/cosponsors?api_key=${this.config.apiKey}`;
     console.log(`Fetching bill cosponsors for ${billId} from ${url}`);
 
-<<<<<<< HEAD
     const result = await IngestionUtils.fetchWithRateLimit(url, undefined, 3, 30000);
     if (!result.success) {
       throw IngestionUtils.handleError(result.error, `fetchBillCosponsors-${billId}`);
-=======
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -190,7 +173,6 @@ export class CongressIngestion {
     } catch (error) {
       console.error(`Error fetching bill cosponsors for ${billId}:`, error);
       throw error;
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
     }
 
     return result.data;
@@ -201,11 +183,9 @@ export class CongressIngestion {
     const url = `${this.baseUrl}/member?api_key=${this.config.apiKey}&offset=${offset}&limit=${pageSize}`;
     console.log(`Fetching members from ${url}`);
 
-<<<<<<< HEAD
     const result = await IngestionUtils.fetchWithRateLimit(url, undefined, 3, 30000);
     if (!result.success) {
       throw IngestionUtils.handleError(result.error, 'fetchMembers');
-=======
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -215,7 +195,6 @@ export class CongressIngestion {
     } catch (error) {
       console.error(`Error fetching members:`, error);
       throw error;
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
     }
 
     return result.data;
@@ -226,11 +205,9 @@ export class CongressIngestion {
     const url = `${this.baseUrl}/member/${memberId}?api_key=${this.config.apiKey}`;
     console.log(`Fetching member details for ${memberId} from ${url}`);
 
-<<<<<<< HEAD
     const result = await IngestionUtils.fetchWithRateLimit(url, undefined, 3, 30000);
     if (!result.success) {
       throw IngestionUtils.handleError(result.error, `fetchMemberDetails-${memberId}`);
-=======
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -240,7 +217,6 @@ export class CongressIngestion {
     } catch (error) {
       console.error(`Error fetching member details for ${memberId}:`, error);
       throw error;
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
     }
 
     return result.data;
@@ -254,11 +230,9 @@ export class CongressIngestion {
     const url = `${this.baseUrl}/committee?api_key=${this.config.apiKey}&offset=${offset}&limit=${pageSize}`;
     console.log(`Fetching committees from ${url}`);
 
-<<<<<<< HEAD
     const result = await IngestionUtils.fetchWithRateLimit(url, undefined, 3, 30000);
     if (!result.success) {
       throw IngestionUtils.handleError(result.error, 'fetchCommittees');
-=======
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -268,7 +242,6 @@ export class CongressIngestion {
     } catch (error) {
       console.error(`Error fetching committees:`, error);
       throw error;
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
     }
 
     return result.data;
@@ -279,11 +252,9 @@ export class CongressIngestion {
     const url = `${this.baseUrl}/committee/${committeeId}?api_key=${this.config.apiKey}`;
     console.log(`Fetching committee details for ${committeeId} from ${url}`);
 
-<<<<<<< HEAD
     const result = await IngestionUtils.fetchWithRateLimit(url, undefined, 3, 30000);
     if (!result.success) {
       throw IngestionUtils.handleError(result.error, `fetchCommitteeDetails-${committeeId}`);
-=======
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -296,7 +267,6 @@ export class CongressIngestion {
         error,
       );
       throw error;
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
     }
 
     return result.data;
@@ -337,7 +307,6 @@ export class CongressIngestion {
 
     let offset = 0;
     let totalProcessed = 0;
-<<<<<<< HEAD
     const pageSize = 250;
     const allBillIds: string[] = [];
 
@@ -345,7 +314,6 @@ export class CongressIngestion {
       // First, collect all bill IDs to process
       while (totalProcessed < limit && allBillIds.length < limit) {
         const billsData = await this.fetchBills(offset, Math.min(pageSize, limit - totalProcessed));
-=======
 
     try {
       while (totalProcessed < limit) {
@@ -353,14 +321,12 @@ export class CongressIngestion {
           offset,
           Math.min(250, limit - totalProcessed),
         );
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
 
         if (!billsData.bills || billsData.bills.length === 0) {
           console.log("No more bills found");
           break;
         }
 
-<<<<<<< HEAD
         console.log(`Found ${billsData.bills.length} bills at offset ${offset}`);
         allBillIds.push(...billsData.bills.map((bill: any) => bill.billId));
         offset += billsData.bills.length;
@@ -391,7 +357,6 @@ export class CongressIngestion {
       );
 
       console.log(`Finished ingesting ${allBillIds.length} bills`);
-=======
         console.log(`Found ${billsData.bills.length} bills`);
 
         // Process each bill
@@ -414,7 +379,6 @@ export class CongressIngestion {
       }
 
       console.log(`Finished ingesting ${totalProcessed} bills`);
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
     } catch (error) {
       console.error('Error ingesting bills:', error);
       throw IngestionUtils.handleError(error, 'ingestBills');
