@@ -3,77 +3,461 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenDiscourse - Political Document Analyzer</title>
-    <link rel="stylesheet" href="/styles/main.css">
+    <title>OpenDiscourse - Political Knowledge Platform</title>
+    <meta name="description" content="Explore political discourse, legislation, and politician data with AI-powered search and analysis.">
+    
+    <!-- Optimized for Cloudflare Pages -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        main {
+            padding: 4rem 0;
+        }
+        
+        .hero {
+            text-align: center;
+            color: white;
+            margin-bottom: 4rem;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        .search-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+        }
+        
+        .search-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .tab.active {
+            border-bottom-color: #667eea;
+            color: #667eea;
+        }
+        
+        .search-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .results {
+            margin-top: 2rem;
+        }
+        
+        .result-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .result-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+        }
+        
+        .result-meta {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .result-description {
+            color: #4a5568;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+        
+        .feature-description {
+            color: #4a5568;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #718096;
+        }
+        
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+        
+        footer {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            padding: 2rem 0;
+            color: #718096;
+            margin-top: 4rem;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .search-form {
+                flex-direction: column;
+            }
+            
+            .nav-buttons {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>OpenDiscourse</h1>
-            <p class="subtitle">AI-Powered Political Document Analysis Platform</p>
-        </header>
-
-        <div class="features">
-            <div class="feature-card">
-                <h3><span class="feature-icon">📄</span> Document Management</h3>
-                <p>Upload, store, and organize political documents with automatic metadata extraction.</p>
-            </div>
-            <div class="feature-card">
-                <h3><span class="feature-icon">🔍</span> Advanced Search</h3>
-                <p>Full-text and semantic search across all documents with powerful filtering options.</p>
-            </div>
-            <div class="feature-card">
-                <h3><span class="feature-icon">🤖</span> AI Analysis</h3>
-                <p>NLP-powered analysis including sentiment, entity extraction, and topic modeling.</p>
-            </div>
-            <div class="feature-card">
-                <h3><span class="feature-icon">🧠</span> Knowledge Graph</h3>
-                <p>Entity relationship mapping and political network visualization.</p>
-            </div>
-            <div class="feature-card">
-                <h3><span class="feature-icon">💬</span> RAG Question Answering</h3>
-                <p>Ask questions about political documents with context-aware answers and citations.</p>
-            </div>
-            <div class="feature-card">
-                <h3><span class="feature-icon">📊</span> Visualization</h3>
-                <p>Interactive dashboards and reports for political trend analysis and comparisons.</p>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">OpenDiscourse</div>
+                <div class="nav-buttons">
+                    <a href="/api/docs" class="btn btn-outline">API Docs</a>
+                    <a href="/health" class="btn btn-primary">Status</a>
+                </div>
             </div>
         </div>
+    </header>
 
-        <div class="cta-section">
-            <h2>Get Started with OpenDiscourse</h2>
-            <p>Upload your first political document and unlock powerful AI insights</p>
-            <a href="/api/health" class="btn">Check System Status</a>
-            <a href="https://github.com/your-org/opendiscourse" class="btn btn-outline">View Documentation</a>
+    <main>
+        <div class="container">
+            <div class="hero">
+                <h1>Political Knowledge Platform</h1>
+                <p>Explore legislation, politicians, and political discourse with AI-powered search and analysis</p>
+            </div>
+
+            <div class="search-section">
+                <div class="search-tabs">
+                    <button class="tab active" data-tab="politicians">Politicians</button>
+                    <button class="tab" data-tab="legislation">Legislation</button>
+                    <button class="tab" data-tab="semantic">Semantic Search</button>
+                </div>
+
+                <div class="search-form">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search politicians, bills, or topics...">
+                    <button class="btn btn-primary" onclick="performSearch()">Search</button>
+                </div>
+
+                <div class="results" id="searchResults"></div>
+            </div>
+
+            <div class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">🏛️</div>
+                    <div class="feature-title">Political Data</div>
+                    <div class="feature-description">
+                        Comprehensive database of politicians, legislation, and voting records
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <div class="feature-title">AI-Powered Analysis</div>
+                    <div class="feature-description">
+                        Semantic search and intelligent insights using Cloudflare AI
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-title">Real-time Updates</div>
+                    <div class="feature-description">
+                        Stay updated with the latest political developments and legislative changes
+                    </div>
+                </div>
+            </div>
         </div>
+    </main>
 
-        <div class="api-section">
-            <h2>API Endpoints</h2>
-            <div class="endpoint">
-                <span class="endpoint-method post">POST</span>
-                <strong>/api/documents</strong> - Upload a political document
-            </div>
-            <div class="endpoint">
-                <span class="endpoint-method get">GET</span>
-                <strong>/api/search?q={query}</strong> - Search documents
-            </div>
-            <div class="endpoint">
-                <span class="endpoint-method post">POST</span>
-                <strong>/api/analyze</strong> - Analyze document content
-            </div>
-            <div class="endpoint">
-                <span class="endpoint-method post">POST</span>
-                <strong>/api/rag/query</strong> - Ask questions about documents
-            </div>
-            <div class="endpoint">
-                <span class="endpoint-method post">POST</span>
-                <strong>/api/graph/query</strong> - Query the knowledge graph
-            </div>
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 OpenDiscourse. Powered by Cloudflare.</p>
         </div>
+    </footer>
 
-        <footer>
-            <p>OpenDiscourse - Political Document Analyzer | Powered by Cloudflare</p>
-        </footer>
-    </div>
+    <script>
+        let currentTab = 'politicians';
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentTab = tab.getAttribute('data-tab');
+                
+                // Update placeholder text
+                const input = document.getElementById('searchInput');
+                const placeholders = {
+                    politicians: 'Search politicians by name, party, or state...',
+                    legislation: 'Search bills by title, congress, or topic...',
+                    semantic: 'Ask questions about politics and policy...'
+                };
+                input.placeholder = placeholders[currentTab];
+                
+                // Clear results
+                document.getElementById('searchResults').innerHTML = '';
+            });
+        });
+
+        // Search functionality
+        async function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) return;
+
+            const resultsDiv = document.getElementById('searchResults');
+            resultsDiv.innerHTML = '<div class="loading">Searching...</div>';
+
+            try {
+                let response;
+                
+                switch (currentTab) {
+                    case 'politicians':
+                        response = await fetch(`/api/politicians?q=${encodeURIComponent(query)}`);
+                        break;
+                    case 'legislation':
+                        response = await fetch(`/api/legislation?q=${encodeURIComponent(query)}`);
+                        break;
+                    case 'semantic':
+                        response = await fetch('/api/search/semantic', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ query, topK: 10 })
+                        });
+                        break;
+                }
+
+                const data = await response.json();
+                displayResults(data, currentTab);
+                
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="error">Search failed. Please try again.</div>';
+                console.error('Search error:', error);
+            }
+        }
+
+        function displayResults(data, type) {
+            const resultsDiv = document.getElementById('searchResults');
+            let results = [];
+
+            switch (type) {
+                case 'politicians':
+                    results = data.politicians || [];
+                    break;
+                case 'legislation':
+                    results = data.legislation || [];
+                    break;
+                case 'semantic':
+                    results = data.results || [];
+                    break;
+            }
+
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div class="loading">No results found.</div>';
+                return;
+            }
+
+            const html = results.map(item => {
+                switch (type) {
+                    case 'politicians':
+                        return `
+                            <div class="result-item">
+                                <div class="result-title">${item.name || 'Unknown'}</div>
+                                <div class="result-meta">${item.party || 'Unknown Party'} • ${item.state || 'Unknown State'}</div>
+                                <div class="result-description">${item.chamber || ''}</div>
+                            </div>
+                        `;
+                    case 'legislation':
+                        return `
+                            <div class="result-item">
+                                <div class="result-title">${item.title || 'Untitled'}</div>
+                                <div class="result-meta">Congress ${item.congress || 'Unknown'} • ${item.type || 'Unknown Type'}</div>
+                                <div class="result-description">${item.summary_short || item.summary || 'No description available'}</div>
+                            </div>
+                        `;
+                    case 'semantic':
+                        return `
+                            <div class="result-item">
+                                <div class="result-title">${item.metadata?.title || 'Document'}</div>
+                                <div class="result-meta">Relevance: ${(item.score * 100).toFixed(1)}% • Type: ${item.metadata?.type || 'Unknown'}</div>
+                                <div class="result-description">${item.metadata?.content || 'No content available'}</div>
+                            </div>
+                        `;
+                    default:
+                        return '';
+                }
+            }).join('');
+
+            resultsDiv.innerHTML = html;
+        }
+
+        // Enter key search
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // Load sample data on page load
+        window.addEventListener('load', () => {
+            // You could load some featured content here
+            console.log('OpenDiscourse Frontend loaded - Powered by Cloudflare');
+        });
+    </script>
 </body>
 </html>
