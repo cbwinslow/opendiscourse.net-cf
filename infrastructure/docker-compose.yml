@@ -1,0 +1,255 @@
+version: '3.8'
+
+services:
+  # Core Infrastructure Services
+  postgres:
+    image: pgvector/pgvector:pg15
+    container_name: opendiscourse-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-opendiscourse}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../initdb.d:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - opendiscourse
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:23.3
+    container_name: opendiscourse-clickhouse
+    environment:
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-opendiscourse}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-default}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-password}
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      - ./clickhouse:/etc/clickhouse-server
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8123/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - opendiscourse
+
+  weaviate:
+    image: semitechnologies/weaviate:1.23.1
+    container_name: opendiscourse-weaviate
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      DEFAULT_VECTORIZER_MODULE: 'none'
+      ENABLE_MODULES: 'backup-filesystem,text2vec-openai,text2vec-cohere,text2vec-huggingface,ref2vec-centroid,generative-openai,qna-openai'
+      CLUSTER_HOSTNAME: 'node1'
+    ports:
+      - "8080:8080"
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/v1/.well-known/ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - opendiscourse
+
+  qdrant:
+    image: qdrant/qdrant:v1.7.3
+    container_name: opendiscourse-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - opendiscourse
+
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: opendiscourse-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-guest}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - opendiscourse
+
+  kong:
+    image: kong:3.4
+    container_name: opendiscourse-kong
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /kong/declarative/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_ADMIN_GUI_LISTEN: 0.0.0.0:8002
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+      - "8002:8002"
+      - "8443:8443"
+    volumes:
+      - ./kong:/kong/declarative
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - opendiscourse
+
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: opendiscourse-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - opendiscourse
+
+  grafana:
+    image: grafana/grafana:10.1.0
+    container_name: opendiscourse-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: false
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - opendiscourse
+
+  loki:
+    image: grafana/loki:2.9.0
+    container_name: opendiscourse-loki
+    command: -config.file=/etc/loki/local-config.yaml
+    ports:
+      - "3100:3100"
+    volumes:
+      - loki_data:/loki
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3100/ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - opendiscourse
+
+  opensearch:
+    image: opensearchproject/opensearch:2.11.0
+    container_name: opendiscourse-opensearch
+    environment:
+      - cluster.name=opendiscourse-cluster
+      - node.name=opensearch-node1
+      - discovery.seed_hosts=opensearch-node1
+      - cluster.initial_cluster_manager_nodes=opensearch-node1
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "DISABLE_INSTALL_DEMO_CONFIG=true"
+      - "DISABLE_SECURITY_PLUGIN=true"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200/_cluster/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - opendiscourse
+
+  graylog:
+    image: graylog/graylog:5.2
+    container_name: opendiscourse-graylog
+    environment:
+      GRAYLOG_PASSWORD_SECRET: ${GRAYLOG_PASSWORD_SECRET:-somepasswordpepper}
+      GRAYLOG_ROOT_PASSWORD_SHA2: ${GRAYLOG_ROOT_PASSWORD_SHA2:-8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918}
+      GRAYLOG_HTTP_EXTERNAL_URI: http://127.0.0.1:9000/
+      GRAYLOG_ELASTICSEARCH_HOSTS: http://opensearch:9200
+    entrypoint: /usr/bin/tini -- wait-for-it opensearch:9200 --  /docker-entrypoint.sh
+    depends_on:
+      - opensearch
+    ports:
+      - "9000:9000"
+      - "12201:12201/udp"
+    volumes:
+      - graylog_data:/usr/share/graylog/data
+    networks:
+      - opendiscourse
+
+volumes:
+  postgres_data:
+  clickhouse_data:
+  weaviate_data:
+  qdrant_data:
+  rabbitmq_data:
+  prometheus_data:
+  grafana_data:
+  loki_data:
+  opensearch_data:
+  graylog_data:
+
+networks:
+  opendiscourse:
+    driver: bridge

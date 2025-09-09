@@ -107,7 +107,7 @@ class ServiceManager:
                 print("Docker is not running. Please start Docker.")
                 return False
             
-            result = self._run_command(["docker-compose", "version"])
+            result = self._run_command(["docker", "compose", "version"])
             if result.returncode != 0:
                 print("Docker Compose is not available. Please install Docker Compose.")
                 return False
@@ -270,7 +270,7 @@ scrape_configs:
             if os.path.exists(compose_file):
                 print(f"Starting services from {compose_file}")
                 result = self._run_command([
-                    "docker-compose", "-f", compose_file, "up", "-d"
+                    "docker", "compose", "-f", compose_file, "up", "-d"
                 ])
                 if result.returncode != 0:
                     print(f"Failed to start services from {compose_file}")
@@ -307,7 +307,7 @@ scrape_configs:
             if os.path.exists(compose_file):
                 print(f"Stopping services from {compose_file}")
                 result = self._run_command([
-                    "docker-compose", "-f", compose_file, "down"
+                    "docker", "compose", "-f", compose_file, "down"
                 ])
                 if result.returncode != 0:
                     print(f"Warning: Issues stopping services from {compose_file}")
@@ -357,7 +357,7 @@ scrape_configs:
     
     def logs(self, service_name: str = None, follow: bool = False):
         """Show logs for a service or all services."""
-        cmd = ["docker-compose"]
+        cmd = ["docker", "compose"]
         
         # Add all compose files
         for compose_file in self.docker_compose_files:

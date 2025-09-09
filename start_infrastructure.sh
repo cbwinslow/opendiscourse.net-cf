@@ -44,7 +44,7 @@ start_services() {
     chmod -R 777 ./data
     
     # Start services
-    docker-compose -f infrastructure/docker-compose.yml up -d
+    docker compose -f infrastructure/docker-compose.yml up -d
     
     # Wait for services to start
     sleep 10
@@ -70,7 +70,7 @@ start_services() {
 # Function to stop services
 stop_services() {
     echo "Stopping OpenDiscourse infrastructure..."
-    docker-compose -f infrastructure/docker-compose.yml down
+    docker compose -f infrastructure/docker-compose.yml down
     echo "✅ All services stopped"
 }
 
@@ -78,9 +78,9 @@ stop_services() {
 view_logs() {
     local service=$1
     if [ -z "$service" ]; then
-        docker-compose -f infrastructure/docker-compose.yml logs -f
+        docker compose -f infrastructure/docker-compose.yml logs -f
     else
-        docker-compose -f infrastructure/docker-compose.yml logs -f "$service"
+        docker compose -f infrastructure/docker-compose.yml logs -f "$service"
     fi
 }
 
@@ -92,7 +92,7 @@ run_migrations() {
     check_service "PostgreSQL" "http://localhost:5432"
     
     # Run migrations using the API service
-    docker-compose -f infrastructure/docker-compose.yml exec api \
+    docker compose -f infrastructure/docker-compose.yml exec api \
         python -m alembic upgrade head
     
     echo "✅ Database migrations completed"
@@ -112,7 +112,7 @@ initialize_system() {
     
     # Initialize default admin user
     echo "Creating default admin user..."
-    docker-compose -f infrastructure/docker-compose.yml exec api \
+    docker compose -f infrastructure/docker-compose.yml exec api \
         python -c "from app.core.security import get_password_hash; from app.db.session import SessionLocal; from app.models.user import User; db = SessionLocal(); db.add(User(email='admin@opendiscourse.net', hashed_password=get_password_hash('admin'), is_superuser=True, is_active=True)); db.commit()"
     
     echo "✅ System initialization completed"
