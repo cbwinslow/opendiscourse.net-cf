@@ -1,0 +1,185 @@
+name: Deploy to Cloudflare Platform
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  # Build and test
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Lint code
+        run: npm run lint
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Build project
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: dist/
+
+  # Deploy D1 database migrations
+  deploy-database:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Wrangler
+        run: npm install -g wrangler
+
+      - name: Apply D1 migrations
+        run: |
+          echo "Applying D1 database migrations..."
+          wrangler d1 migrations apply opendiscourse-db --remote
+          wrangler d1 migrations apply opendiscourse-analytics --remote
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  # Deploy main worker
+  deploy-worker:
+    needs: [build, deploy-database]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: dist/
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --env production
+
+  # Deploy frontend to Cloudflare Pages
+  deploy-frontend:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy frontend --project-name opendiscourse-frontend
+
+  # Deploy staging environment
+  deploy-staging:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: dist/
+
+      - name: Deploy staging worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --env staging
+
+      - name: Deploy staging frontend
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy frontend --project-name opendiscourse-frontend-staging
+
+  # Health check after deployment
+  health-check:
+    needs: [deploy-worker, deploy-frontend]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Check worker health
+        run: |
+          echo "Checking worker health..."
+          curl -f https://opendiscourse.net/health || exit 1
+
+      - name: Check frontend availability
+        run: |
+          echo "Checking frontend availability..."
+          curl -f https://opendiscourse.pages.dev || exit 1
+
+      - name: Run smoke tests
+        run: |
+          echo "Running smoke tests..."
+          # Test politicians API
+          curl -f "https://opendiscourse.net/api/politicians?q=test" | jq '.politicians' || exit 1
+          
+          # Test legislation API  
+          curl -f "https://opendiscourse.net/api/legislation?q=test" | jq '.legislation' || exit 1
+          
+          echo "All health checks passed!"
+
+  # Notify deployment status
+  notify:
+    needs: [deploy-worker, deploy-frontend, health-check]
+    runs-on: ubuntu-latest
+    if: always() && github.ref == 'refs/heads/main'
+    steps:
+      - name: Deployment success notification
+        if: needs.health-check.result == 'success'
+        run: |
+          echo "🚀 OpenDiscourse successfully deployed to Cloudflare!"
+          echo "Worker: https://opendiscourse.net"
+          echo "Frontend: https://opendiscourse.pages.dev"
+
+      - name: Deployment failure notification
+        if: failure()
+        run: |
+          echo "❌ OpenDiscourse deployment failed!"
+          echo "Check the workflow logs for details."

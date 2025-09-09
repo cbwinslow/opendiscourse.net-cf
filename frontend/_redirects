@@ -1,0 +1,12 @@
+# Redirects for old URLs and clean routing
+
+# Redirect old API paths
+/v1/api/* /api/:splat 301
+/legacy/* /api/:splat 301
+
+# Clean URLs
+/politician/:id /politicians/:id 301
+/bill/:id /legislation/:id 301
+
+# SEO redirects
+/search /search/bills 301

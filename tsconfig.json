@@ -17,8 +17,6 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "types": ["@cloudflare/workers-types"],
-    "typeRoots": ["./node_modules/@types"],
 
     "composite": true,
     "declaration": true,
