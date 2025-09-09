@@ -1,23 +1,17 @@
 // Main API service for OpenDiscourse
 
-<<<<<<< HEAD
-=======
 import { OpenAI } from "@langchain/openai";
 
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
 // Coordinates all services and handles API requests
 import { WebsiteAnalysisAPI } from "./website_analysis_api.js";
 
-<<<<<<< HEAD
 // Type definitions for document analysis
 type AnalysisRequest = {
   documentId: string;
   content: string;
 };
-=======
 // Adjust import paths to be relative to the current file location
 import { SearchService } from "../search/search_service.js";
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
 
 type DocumentAnalysis = {
   id: string;
@@ -52,11 +46,8 @@ interface Env {
 }
 
 export class OpenDiscourseAPI {
-<<<<<<< HEAD
   private static websiteAnalysisAPI: WebsiteAnalysisAPI;
-=======
   private static llm: OpenAI;
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
 
   // Generate a unique ID
   private static generateId(): string {
@@ -328,7 +319,6 @@ export class OpenDiscourseAPI {
     if (method === "OPTIONS") {
       return new Response(null, { headers: corsHeaders });
     }
-<<<<<<< HEAD
     
     // Initialize services
     await this.initialize(env);
@@ -355,9 +345,7 @@ export class OpenDiscourseAPI {
       }
     }
     
-=======
 
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
     try {
       // Route handling
       if (path === "/" && method === "GET") {
@@ -403,11 +391,8 @@ export class OpenDiscourseAPI {
       );
     }
   }
-<<<<<<< HEAD
   
-=======
 
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
   static async handleRoot(_request: Request, _env: Env): Promise<Response> {
     const html = `
 <!DOCTYPE html>
@@ -445,10 +430,8 @@ export class OpenDiscourseAPI {
       headers: { "Content-Type": "text/html" },
     });
   }
-<<<<<<< HEAD
   
   static async handleDocumentRoutes(request: Request, env: Env, _path: string): Promise<Response> {
-=======
 
   static async handleDocumentRoutes(
     request: Request,
@@ -496,7 +479,6 @@ export class OpenDiscourseAPI {
     env: Env,
     path: string,
   ): Promise<Response> {
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
     const corsHeaders = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
@@ -506,7 +488,6 @@ export class OpenDiscourseAPI {
 
     const method = request.method;
     const url = new URL(request.url);
-<<<<<<< HEAD
     const documentId = url.pathname.split('/').pop() || '';
     
     try {
@@ -544,7 +525,6 @@ export class OpenDiscourseAPI {
   }
   
   static async deleteDocument(_request: Request, _env: Env, _documentId: string): Promise<Response> {
-=======
 
     if (path === "/api/search" && method === "GET") {
       const query = url.searchParams.get("q") || "";
@@ -865,14 +845,12 @@ export class OpenDiscourseAPI {
     _env: Env,
     documentId: string,
   ): Promise<Response> {
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
     const corsHeaders = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
       "Content-Type": "application/json",
     };
-<<<<<<< HEAD
     
     return new Response(JSON.stringify({
       success: true,
@@ -883,7 +861,6 @@ export class OpenDiscourseAPI {
   }
   
   static async getDocument(_request: Request, _env: Env, documentId: string): Promise<Response> {
-=======
 
     // Simulate analysis retrieval
     const analysis = {
@@ -916,14 +893,12 @@ export class OpenDiscourseAPI {
 
   // RAG methods
   static async askQuestion(request: Request, _env: Env): Promise<Response> {
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
     const corsHeaders = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
       "Content-Type": "application/json",
     };
-<<<<<<< HEAD
     
     return new Response(JSON.stringify({
       success: true,
@@ -965,7 +940,6 @@ export class OpenDiscourseAPI {
   }
   
   static async uploadDocument(_request: Request, _env: Env): Promise<Response> {
-=======
 
     // Parse request body
     const body = (await request.json()) as {
@@ -1026,14 +1000,12 @@ Answer:`;
   }
 
   static async compareDocuments(request: Request, _env: Env): Promise<Response> {
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
     const corsHeaders = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
       "Content-Type": "application/json",
     };
-<<<<<<< HEAD
     
     return new Response(JSON.stringify({
       success: true,
@@ -1096,7 +1068,6 @@ Answer:`;
   // Document comparison
   static async compareDocuments(_request: Request, _env: Env): Promise<Response> {
     const documentIds = ["doc-1", "doc-2"];
-=======
 
     // Parse request body
     const body = (await request.json()) as { document_ids: string[] };
@@ -1116,7 +1087,6 @@ Answer:`;
     }
 
     // Simulate document comparison
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
     const comparison = {
       document_ids: documentIds,
       similarity_score: 0.8,
@@ -1124,7 +1094,6 @@ Answer:`;
         "Different approaches to economic policy",
         "Varied perspectives on healthcare reform",
       ],
-<<<<<<< HEAD
       common_themes: ["Economic policy", "Healthcare reform"],
       summary: "The documents share several common themes but differ in their approach to economic and healthcare policies.",
       created_at: new Date().toISOString()
@@ -1135,7 +1104,6 @@ Answer:`;
       comparison
     });
   }
-=======
       common_themes: [
         "Focus on infrastructure development",
         "Emphasis on national security",
@@ -1160,5 +1128,4 @@ Answer:`;
   static generateId(): string {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
 }

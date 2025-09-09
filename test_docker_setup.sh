@@ -11,9 +11,15 @@ then
 fi
 
 # Check if Docker Compose is installed
-if ! command -v docker-compose &> /dev/null
+if ! command -v docker &> /dev/null
 then
-    echo "Docker Compose is not installed. Please install Docker Compose first."
+    echo "Docker is not installed. Please install Docker first."
+    exit 1
+fi
+
+if ! docker compose version &> /dev/null
+then
+    echo "Docker Compose is not available. Please install Docker Compose first."
     exit 1
 fi
 
@@ -50,11 +56,11 @@ echo "All required files are present."
 echo "Testing Docker build..."
 if docker build -t opendiscourse-neo4j-test . -f Dockerfile --no-cache
 then
-    echo "Neo4j Docker build successful."
+    echo "Main API Docker build successful."
     # Clean up test image
     docker rmi opendiscourse-neo4j-test
 else
-    echo "Neo4j Docker build failed."
+    echo "Main API Docker build failed."
     exit 1
 fi
 
@@ -69,4 +75,4 @@ else
 fi
 
 echo "Docker setup verification completed successfully."
-echo "You can now run 'docker-compose up -d' to start the services."
+echo "You can now run 'docker compose up -d' to start the services."

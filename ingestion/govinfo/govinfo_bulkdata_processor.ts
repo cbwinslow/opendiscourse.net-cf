@@ -123,7 +123,6 @@ export class GovInfoBulkDataProcessor {
     year?: number,
   ): Promise<BulkDataCollection[]> {
     try {
-<<<<<<< HEAD
       console.log(`Fetching bulkdata files for collection: ${collection}${year ? ` (${year})` : ''}`);
       
       // In a production environment, we would fetch the actual file list
@@ -132,7 +131,6 @@ export class GovInfoBulkDataProcessor {
       
     } catch (error) {
       console.error(`Error listing files for collection ${collection}:`, error);
-=======
       console.log(
         `Listing bulkdata files for collection: ${collection}${year ? ` (${year})` : ""}`,
       );
@@ -162,7 +160,6 @@ export class GovInfoBulkDataProcessor {
         `Error listing bulkdata files for collection ${collection}:`,
         error,
       );
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
       throw error;
     }
   }
@@ -173,7 +170,6 @@ export class GovInfoBulkDataProcessor {
     const timeout = setTimeout(() => controller.abort(), this.config.ingestion.timeout || 30000);
     
     try {
-<<<<<<< HEAD
       const response = await fetch(url, { 
         signal: controller.signal,
         highWaterMark: 1024 * 1024, // 1MB chunks
@@ -189,7 +185,6 @@ export class GovInfoBulkDataProcessor {
       const fileStream = createWriteStream(destination, { highWaterMark: 1024 * 1024 });
       await pipelineAsync(response.body, fileStream);
       
-=======
       console.log(`Processing bulkdata file: ${fileInfo.title}`);
 
       // In a real implementation, we would:
@@ -212,7 +207,6 @@ export class GovInfoBulkDataProcessor {
         content: content,
         processedAt: new Date().toISOString(),
       };
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
     } catch (error) {
       // Clean up partially downloaded file
       if (existsSync(destination)) {
@@ -391,7 +385,6 @@ export class GovInfoBulkDataProcessor {
 
       // Get list of files
       const files = await this.listBulkDataFiles(collection);
-<<<<<<< HEAD
       
       // Process files in parallel batches
       const batchSize = this.config.ingestion.batchSize || 10;
@@ -409,7 +402,6 @@ export class GovInfoBulkDataProcessor {
         
         // Small delay between batches to prevent overwhelming the system
         await new Promise(resolve => setTimeout(resolve, 100));
-=======
 
       // Process files (up to limit)
       const processLimit = Math.min(files.length, limit);
@@ -419,7 +411,6 @@ export class GovInfoBulkDataProcessor {
           await this.processBulkDataFile(fileInfo);
           console.log(`Successfully processed file: ${fileInfo.title}`);
         } catch (error) {
->>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
           console.error(`Failed to process file ${fileInfo.title}:`, error);
         }
       }

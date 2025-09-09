@@ -1,0 +1,53 @@
+# OpenDiscourse Worker Service Dockerfile
+FROM node:18-alpine AS base
+
+FROM base AS deps
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json* ./
+
+# Install all dependencies (including dev dependencies for building)
+RUN npm ci
+
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Build the application
+RUN npm run build
+
+# Production image for worker
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+# Create a non-privileged user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 worker
+
+# Copy the built application
+COPY --from=builder --chown=worker:nodejs /app/dist ./dist
+COPY --from=deps --chown=worker:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=worker:nodejs /app/package.json ./package.json
+
+# Copy worker-specific files
+COPY --from=builder --chown=worker:nodejs /app/services ./services
+COPY --from=builder --chown=worker:nodejs /app/ingestion ./ingestion
+COPY --from=builder --chown=worker:nodejs /app/scripts ./scripts
+COPY --from=builder --chown=worker:nodejs /app/ai_crew ./ai_crew
+
+USER worker
+
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+
+# Worker command - runs background processing tasks
+CMD ["node", "dist/worker.js"]
