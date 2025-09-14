@@ -1,4 +1,4 @@
-import { D1Database } from '@cloudflare/workers-types';
+import { D1Database } from "@cloudflare/workers-types";
 
 interface R1DatabaseConfig {
   db: D1Database;
@@ -21,12 +21,20 @@ export class R1DatabaseClient {
     file_size: number;
     metadata?: Record<string, unknown>;
   }) {
-    const { id, title, source, url, content_type, file_size, metadata = {} } = document;
-    
+    const {
+      id,
+      title,
+      source,
+      url,
+      content_type,
+      file_size,
+      metadata = {},
+    } = document;
+
     await this.db
       .prepare(
         `INSERT INTO documents (id, title, source, url, content_type, file_size, metadata, processed)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .bind(
         id,
@@ -36,7 +44,7 @@ export class R1DatabaseClient {
         content_type,
         file_size,
         JSON.stringify(metadata),
-        false
+        false,
       )
       .run();
 
@@ -45,7 +53,7 @@ export class R1DatabaseClient {
 
   async getDocument(id: string) {
     const result = await this.db
-      .prepare('SELECT * FROM documents WHERE id = ?')
+      .prepare("SELECT * FROM documents WHERE id = ?")
       .bind(id)
       .first();
     return result || null;
@@ -54,13 +62,17 @@ export class R1DatabaseClient {
   // Chunk Operations
   async insertChunks(chunks: {
     documentId: string;
-    chunks: { text: string; index: number; metadata?: Record<string, unknown> }[];
+    chunks: {
+      text: string;
+      index: number;
+      metadata?: Record<string, unknown>;
+    }[];
     embeddings: number[][];
   }) {
     const { documentId, chunks: chunkData, embeddings } = chunks;
     const stmt = this.db.prepare(
       `INSERT INTO document_chunks (document_id, chunk_text, chunk_index, embedding, metadata)
-       VALUES (?, ?, ?, ?, ?)`
+       VALUES (?, ?, ?, ?, ?)`,
     );
 
     const batch = this.db.batch(
@@ -70,18 +82,21 @@ export class R1DatabaseClient {
           chunk.text,
           chunk.index,
           JSON.stringify(embeddings[i]),
-          JSON.stringify(chunk.metadata || {})
-        )
-      )
+          JSON.stringify(chunk.metadata || {}),
+        ),
+      ),
     );
 
     await batch;
   }
 
   // Search Operations
-  async searchChunks(queryEmbedding: number[], options: { limit?: number; similarityThreshold?: number } = {}) {
+  async searchChunks(
+    queryEmbedding: number[],
+    options: { limit?: number; similarityThreshold?: number } = {},
+  ) {
     const { limit = 5, similarityThreshold = 0.7 } = options;
-    
+
     const results = await this.db
       .prepare(
         `SELECT 
@@ -98,14 +113,14 @@ export class R1DatabaseClient {
          JOIN documents d ON dc.document_id = d.id
          WHERE 1 - (dc.embedding <=> ?) > ?
          ORDER BY dc.embedding <=> ?
-         LIMIT ?`
+         LIMIT ?`,
       )
       .bind(
         JSON.stringify(queryEmbedding),
         JSON.stringify(queryEmbedding),
         similarityThreshold,
         JSON.stringify(queryEmbedding),
-        limit
+        limit,
       )
       .all();
 
@@ -121,7 +136,7 @@ export class R1DatabaseClient {
          ON CONFLICT (document_id) DO UPDATE
          SET status = 'pending',
              retry_count = processing_queue.retry_count + 1,
-             error_message = NULL`
+             error_message = NULL`,
       )
       .bind(documentId)
       .run();
@@ -141,7 +156,7 @@ export class R1DatabaseClient {
            LIMIT ?
            FOR UPDATE SKIP LOCKED
          )
-         RETURNING *`
+         RETURNING *`,
       )
       .bind(limit)
       .all();
@@ -155,7 +170,7 @@ export class R1DatabaseClient {
         `UPDATE processing_queue
          SET status = 'completed',
              updated_at = CURRENT_TIMESTAMP
-         WHERE id = ?`
+         WHERE id = ?`,
       )
       .bind(id)
       .run();
@@ -169,7 +184,7 @@ export class R1DatabaseClient {
              error_message = ?,
              retry_count = COALESCE(retry_count, 0) + 1,
              updated_at = CURRENT_TIMESTAMP
-         WHERE id = ?`
+         WHERE id = ?`,
       )
       .bind(error.substring(0, 1000), id)
       .run();
@@ -178,30 +193,38 @@ export class R1DatabaseClient {
   // Maintenance Operations
   async getStats() {
     const [documents, chunks, queue] = await Promise.all([
-      this.db.prepare('SELECT COUNT(*) as count FROM documents').first('count') as Promise<number>,
-      this.db.prepare('SELECT COUNT(*) as count FROM document_chunks').first('count') as Promise<number>,
+      this.db
+        .prepare("SELECT COUNT(*) as count FROM documents")
+        .first("count") as Promise<number>,
+      this.db
+        .prepare("SELECT COUNT(*) as count FROM document_chunks")
+        .first("count") as Promise<number>,
       this.db
         .prepare(
           `SELECT 
              status, 
              COUNT(*) as count 
            FROM processing_queue 
-           GROUP BY status`
+           GROUP BY status`,
         )
         .all()
-        .then((result) => result.results)
+        .then((result) => result.results),
     ]);
 
     return {
       documents,
       chunks,
-      queue: queue.reduce((acc, item) => ({
-        ...acc,
-        [item.status as string]: item.count
-      }), {})
+      queue: queue.reduce(
+        (acc, item) => ({
+          ...acc,
+          [item.status as string]: item.count,
+        }),
+        {},
+      ),
     };
   }
 }
 
 // Create a singleton instance
-export const createR1Database = (db: D1Database) => new R1DatabaseClient({ db });
+export const createR1Database = (db: D1Database) =>
+  new R1DatabaseClient({ db });

@@ -14,6 +14,7 @@ This directory contains an AI-powered code analysis system that automatically re
 ## Prerequisites
 
 1. Install [Ollama](https://ollama.ai/) and pull the desired model:
+
    ```bash
    ollama pull qwen-coder
    ```
@@ -26,18 +27,20 @@ This directory contains an AI-powered code analysis system that automatically re
 ## Setup
 
 1. Install Python dependencies:
+
    ```bash
    pip install -r requirements.txt
    ```
 
 2. Set up environment variables in a `.env` file:
+
    ```
    # Required for GitHub integration
    GITHUB_TOKEN=your_github_token
-   
+
    # Optional: For Slack notifications
    SLACK_WEBHOOK=your_slack_webhook_url
-   
+
    # Ollama configuration (defaults shown)
    OLLAMA_MODEL=qwen-coder
    OLLAMA_BASE_URL=http://localhost:11434
@@ -65,21 +68,25 @@ docker run -e GITHUB_TOKEN=your_token -v $(pwd):/app ai-crew
 ## Agents
 
 ### Code Reviewer
+
 - **Role**: Senior Code Reviewer
 - **Goal**: Identify potential issues, bugs, and improvements
 - **Focus**: Code quality, best practices, security vulnerabilities, performance bottlenecks
 
 ### Documentation Specialist
+
 - **Role**: Documentation Specialist
 - **Goal**: Create and maintain clear documentation
 - **Focus**: README files, docstrings, architecture diagrams, API documentation
 
 ### Quality Assurance Engineer
+
 - **Role**: Quality Assurance Engineer
 - **Goal**: Ensure code quality and test coverage
 - **Focus**: Test coverage, edge cases, error handling, coding standards
 
 ### Improvement Proposer
+
 - **Role**: Technical Lead
 - **Goal**: Propose architectural improvements
 - **Focus**: Refactoring, performance optimization, technical debt reduction
@@ -119,11 +126,13 @@ self.llm = Ollama(
 ### Common Issues
 
 1. **Ollama server not running**:
+
    ```bash
    ollama serve
    ```
 
 2. **Model not found**:
+
    ```bash
    ollama pull qwen-coder
    ```

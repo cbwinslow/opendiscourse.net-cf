@@ -40,18 +40,21 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 ## Key Features
 
 ### Document Management
+
 - Upload and organize political documents
 - Automatic metadata extraction and categorization
 - Version control and document history
 - Access control and permissions management
 
 ### Advanced Search
+
 - Full-text search across all documents
 - Semantic search using vector embeddings
 - Faceted search with filtering options
 - Similar document recommendations
 
 ### AI-Powered Analysis
+
 - Named entity recognition (people, organizations, locations)
 - Sentiment analysis of political content
 - Topic modeling and categorization
@@ -59,12 +62,14 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 - Document summarization
 
 ### RAG Question Answering
+
 - Context-aware responses to political questions
 - Citations and source references
 - Multi-document synthesis and comparison
 - Fact-checking capabilities
 
 ### Data Visualization
+
 - Interactive dashboards for political analysis
 - Trend analysis over time
 - Comparative analysis between politicians/parties
@@ -73,6 +78,7 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 ## Data Sources
 
 ### Primary Sources
+
 1. **govinfo.gov** - Official U.S. government publications
    - Legislative bills and resolutions
    - Congressional records
@@ -86,6 +92,7 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
    - Hearings and reports
 
 ### Secondary Sources
+
 - Web crawling of government websites (via crawl4ai-rag integration)
 - User-uploaded documents
 - Third-party political databases
@@ -93,6 +100,7 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 ## Technical Implementation
 
 ### Cloudflare Services
+
 - **Workers**: Serverless compute for API endpoints and processing
 - **D1**: Distributed SQL database for structured data
 - **R2**: Object storage for document files
@@ -101,6 +109,7 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 - **AI Gateway**: Access to AI models for processing
 
 ### Data Processing Pipeline
+
 1. **Ingestion**: Fetch data from APIs and file uploads
 2. **Parsing**: Extract text content from various formats
 3. **Analysis**: Process documents through NLP pipeline
@@ -110,6 +119,7 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 7. **Indexing**: Make content searchable through APIs
 
 ### Database Schema
+
 - Normalized tables for documents, metadata, and analysis results
 - Efficient indexing for performance
 - Support for complex queries and relationships
@@ -118,12 +128,14 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 ## Deployment Architecture
 
 ### Edge Computing
+
 - Global distribution through Cloudflare's network
 - Low-latency access from anywhere
 - Automatic scaling based on demand
 - Built-in DDoS protection and security
 
 ### Microservices Design
+
 - Modular architecture for easy maintenance
 - Independent scaling of components
 - Resilient to failures
@@ -132,12 +144,14 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 ## Security and Privacy
 
 ### Data Protection
+
 - Encryption at rest and in transit
 - Access control and authentication
 - Audit logging for compliance
 - Data retention and deletion policies
 
 ### Privacy Considerations
+
 - Minimal data collection
 - User consent for data processing
 - Compliance with government regulations
@@ -146,12 +160,14 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 ## Performance and Scalability
 
 ### High Performance
+
 - Edge computing for low latency
 - Caching for frequently accessed data
 - Optimized database queries
 - Efficient vector search algorithms
 
 ### Scalability
+
 - Automatic scaling with Cloudflare Workers
 - Distributed database architecture
 - Object storage for unlimited document capacity
@@ -160,12 +176,14 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 ## Future Enhancements
 
 ### Short-term Goals
+
 1. User authentication and account management
 2. Advanced visualization dashboards
 3. Mobile application for iOS and Android
 4. Browser extension for research assistance
 
 ### Long-term Vision
+
 1. Multilingual support for international documents
 2. Real-time collaboration features
 3. Advanced RAG with multi-hop reasoning
@@ -175,12 +193,14 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 ## Integration Opportunities
 
 ### crawl4ai-rag Integration
+
 - Automated web crawling of government websites
 - Enhanced knowledge base creation
 - Real-time research assistant capabilities
 - Continuous monitoring of political developments
 
 ### Third-party Integrations
+
 - Social media analysis for political sentiment
 - News aggregation for context
 - Academic research databases

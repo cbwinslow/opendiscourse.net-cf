@@ -12,21 +12,23 @@
 ## Setup Steps
 
 1. **Login to Cloudflare**:
+
    ```bash
    wrangler login
    ```
 
 2. **Create required Cloudflare resources**:
+
    ```bash
    # Create D1 database
    wrangler d1 create opendiscourse-db
-   
+
    # Create R2 bucket
    wrangler r2 bucket create opendiscourse-documents
-   
+
    # Create KV namespace
    wrangler kv:namespace create "opendiscourse-cache"
-   
+
    # Create Vectorize index
    wrangler vectorize create opendiscourse-vector-index --preset @cf/baai/bge-small-en-v1.5
    ```
@@ -43,6 +45,7 @@
 ## Development
 
 ### Running Locally
+
 ```bash
 npm run dev
 ```
@@ -50,14 +53,17 @@ npm run dev
 This will start a local development server on `http://localhost:8787`
 
 ### Testing API Endpoints
+
 Once the development server is running, you can test the API endpoints:
 
 1. Health check:
+
    ```bash
    curl http://localhost:8787/api/health
    ```
 
 2. List documents:
+
    ```bash
    curl http://localhost:8787/api/documents
    ```
@@ -70,6 +76,7 @@ Once the development server is running, you can test the API endpoints:
 ## Deployment
 
 ### Deploy to Cloudflare
+
 ```bash
 npm run deploy
 ```
@@ -77,7 +84,9 @@ npm run deploy
 This will deploy the worker to your Cloudflare account using the configuration in `wrangler.toml`.
 
 ### Environment Variables
+
 For production deployment, you may need to set environment variables:
+
 ```bash
 wrangler secret put MY_SECRET_KEY
 ```
@@ -85,12 +94,15 @@ wrangler secret put MY_SECRET_KEY
 ## Monitoring
 
 ### View Logs
+
 ```bash
 npm run logs
 ```
 
 ### View Metrics
+
 You can view detailed metrics and logs in the Cloudflare dashboard:
+
 1. Go to the Workers & Pages section
 2. Select your worker
 3. View the Analytics tab for performance metrics
@@ -99,12 +111,15 @@ You can view detailed metrics and logs in the Cloudflare dashboard:
 ## Database Management
 
 ### Apply Migrations
+
 ```bash
 npm run migrate
 ```
 
 ### Direct Database Access
+
 For direct database access during development:
+
 ```bash
 wrangler d1 execute opendiscourse-db --command "SELECT * FROM documents LIMIT 5;"
 ```

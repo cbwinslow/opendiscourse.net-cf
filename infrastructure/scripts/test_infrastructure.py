@@ -12,14 +12,29 @@ from psycopg2.extras import execute_values
 import pika
 import time
 import numpy as np
-from typing import List, Dict, Any, Optional
+from typing import Dict, Any
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv(os.path.join(os.path.dirname(__file__), '../../.env'))
 
+# Note: this file defines TestInfrastructure and can be executed directly as a
+# standalone integration script. Integration pytest wrappers live under
+# `infrastructure/tests/` and will choose whether to run these checks.
+
 class TestInfrastructure:
     def __init__(self):
+        """
+        Initialize TestInfrastructure instance.
+        
+        Creates attributes used to hold external connections/clients and sets them to None:
+        - pg_conn: PostgreSQL connection
+        - ch_conn: (unused/placeholder) channel/connection for message broker testing
+        - rabbit_conn: RabbitMQ connection
+        - rabbit_channel: RabbitMQ channel
+        
+        These are populated by the corresponding connect_* methods when tests run.
+        """
         self.pg_conn = None
         self.ch_conn = None
         self.rabbit_conn = None

@@ -7,17 +7,20 @@ We have successfully verified and configured both your govinfo.gov and congress.
 ## What We've Done
 
 ### 1. API Key Configuration
+
 - ✅ Added your govinfo.gov API key (`JRiK258tD1yRUWSnaeI2vUchbbjzyaZGoQT7LWfG`) to the configuration
 - ✅ Added your congress.gov API key (`nt7MSte5iCSAphsEVqv10WdjdNU0a7QHCfEagcFj`) to the configuration
 - ✅ Verified that both API keys work for accessing data
 - ✅ Confirmed that bulkdata URLs are accessible
 
 ### 2. Configuration Management
+
 - ✅ Updated `ingestion/config/api_config.json` with both real API keys
 - ✅ Maintained all collection definitions for comprehensive data access
 - ✅ Kept Cloudflare configuration placeholders for deployment
 
 ### 3. API Access Verification
+
 - ✅ Verified that the govinfo.gov collections endpoint works
 - ✅ Verified that the congress.gov bills endpoint works
 - ✅ Confirmed that bulkdata URLs are accessible
@@ -26,16 +29,19 @@ We have successfully verified and configured both your govinfo.gov and congress.
 ## API Endpoints That Work
 
 ### GovInfo.gov Collections Endpoint (Verified Working)
+
 ```bash
 curl "https://api.govinfo.gov/collections?api_key=JRiK258tD1yRUWSnaeI2vUchbbjzyaZGoQT7LWfG"
 ```
 
 ### Congress.gov Bills Endpoint (Verified Working)
+
 ```bash
 curl "https://api.congress.gov/v3/bill?api_key=nt7MSte5iCSAphsEVqv10WdjdNU0a7QHCfEagcFj&limit=1"
 ```
 
 ### Bulkdata Access (Verified Working)
+
 - Base URL: https://www.govinfo.gov/bulkdata
 - BILLS Collection: https://www.govinfo.gov/bulkdata/BILLS
 - Other Collections: Accessible via https://www.govinfo.gov/bulkdata/{COLLECTION_NAME}
@@ -43,6 +49,7 @@ curl "https://api.congress.gov/v3/bill?api_key=nt7MSte5iCSAphsEVqv10WdjdNU0a7QHC
 ## Next Steps
 
 ### 1. Set Up Cloudflare Resources
+
 ```bash
 # Login to Cloudflare
 wrangler login
@@ -55,19 +62,23 @@ wrangler vectorize create opendiscourse-vector-index --dimensions 1024 --metric 
 ```
 
 ### 2. Update wrangler.toml
+
 Add the resource IDs returned from the previous commands to your `wrangler.toml` file.
 
 ### 3. Run Database Migrations
+
 ```bash
 npm run migrate
 ```
 
 ### 4. Deploy the Application
+
 ```bash
 npm run deploy
 ```
 
 ### 5. Start Ingesting Data
+
 ```bash
 # Ingest from both sources
 npm run ingest:all
@@ -83,6 +94,7 @@ npm run ingest:bulkdata   # Uses govinfo.gov bulkdata (recommended)
 We recommend a hybrid approach for comprehensive data coverage:
 
 ### Primary Approach (Recommended)
+
 1. **GovInfo.gov Bulkdata** - Most reliable for large document collections
    - BILLS: Congressional Bills (278,681 packages)
    - CREC: Congressional Record (5,796 packages)
@@ -91,6 +103,7 @@ We recommend a hybrid approach for comprehensive data coverage:
    - PLAW: Public and Private Laws (5,929 packages)
 
 ### Secondary Approach (Supplementary)
+
 2. **Congress.gov API** - For current legislative information
    - Bills with latest action data
    - Member information
@@ -99,6 +112,7 @@ We recommend a hybrid approach for comprehensive data coverage:
 ## Troubleshooting
 
 If you encounter issues:
+
 1. Use the bulkdata approach for govinfo.gov (more reliable)
 2. Check API status pages for service interruptions
 3. Contact API support if issues persist

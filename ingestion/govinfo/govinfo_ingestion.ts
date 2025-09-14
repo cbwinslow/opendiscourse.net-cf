@@ -41,10 +41,14 @@ export class GovInfoIngestion {
   }
 
   // Fetch list of packages for a collection
-  async fetchPackages(collection: string, offset: number = 0, pageSize: number = 100): Promise<any> {
+  async fetchPackages(
+    collection: string,
+    offset: number = 0,
+    pageSize: number = 100,
+  ): Promise<any> {
     const url = `${this.baseUrl}/collections/${collection}?offset=${offset}&pageSize=${pageSize}&api_key=${this.config.apiKey}`;
     console.log(`Fetching packages for collection ${collection} from ${url}`);
-    
+
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -52,7 +56,10 @@ export class GovInfoIngestion {
       }
       return await response.json();
     } catch (error) {
-      console.error(`Error fetching packages for collection ${collection}:`, error);
+      console.error(
+        `Error fetching packages for collection ${collection}:`,
+        error,
+      );
       throw error;
     }
   }
@@ -61,7 +68,7 @@ export class GovInfoIngestion {
   async fetchPackageDetails(packageId: string): Promise<any> {
     const url = `${this.baseUrl}/packages/${packageId}/summary?api_key=${this.config.apiKey}`;
     console.log(`Fetching package details for ${packageId} from ${url}`);
-    
+
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -78,7 +85,7 @@ export class GovInfoIngestion {
   async fetchGranules(packageId: string): Promise<any> {
     const url = `${this.baseUrl}/packages/${packageId}/granules?api_key=${this.config.apiKey}`;
     console.log(`Fetching granules for package ${packageId} from ${url}`);
-    
+
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -95,7 +102,7 @@ export class GovInfoIngestion {
   async fetchChapters(granuleId: string): Promise<any> {
     const url = `${this.baseUrl}/granules/${granuleId}/chapters?api_key=${this.config.apiKey}`;
     console.log(`Fetching chapters for granule ${granuleId} from ${url}`);
-    
+
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -111,7 +118,7 @@ export class GovInfoIngestion {
   // Download file content
   async downloadFile(url: string): Promise<ArrayBuffer> {
     console.log(`Downloading file from ${url}`);
-    
+
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -127,33 +134,33 @@ export class GovInfoIngestion {
   // Process a package and its contents
   async processPackage(packageId: string): Promise<any> {
     console.log(`Processing package ${packageId}`);
-    
+
     try {
       // Fetch package details
       const packageDetails = await this.fetchPackageDetails(packageId);
-      
+
       // Extract downloads
       const downloads: Download[] = [];
       if (packageDetails.download) {
         for (const [type, url] of Object.entries(packageDetails.download)) {
           downloads.push({
             type,
-            url: url as string
+            url: url as string,
           });
         }
       }
-      
+
       // Fetch granules if available
       let granules: any[] = [];
       if (packageDetails.granulesLink) {
         const granulesData = await this.fetchGranules(packageId);
         granules = granulesData.granules || [];
       }
-      
+
       return {
         package: packageDetails,
         downloads,
-        granules
+        granules,
       };
     } catch (error) {
       console.error(`Error processing package ${packageId}:`, error);
@@ -162,27 +169,36 @@ export class GovInfoIngestion {
   }
 
   // Ingest data for a collection
-  async ingestCollection(collection: string, limit: number = 1000): Promise<void> {
+  async ingestCollection(
+    collection: string,
+    limit: number = 1000,
+  ): Promise<void> {
     console.log(`Ingesting data for collection ${collection}`);
-    
+
     let offset = 0;
     let totalProcessed = 0;
-    
+
     try {
       while (totalProcessed < limit) {
-        const packagesData = await this.fetchPackages(collection, offset, Math.min(100, limit - totalProcessed));
-        
+        const packagesData = await this.fetchPackages(
+          collection,
+          offset,
+          Math.min(100, limit - totalProcessed),
+        );
+
         if (!packagesData.packages || packagesData.packages.length === 0) {
           console.log(`No more packages found for collection ${collection}`);
           break;
         }
-        
-        console.log(`Found ${packagesData.packages.length} packages in collection ${collection}`);
-        
+
+        console.log(
+          `Found ${packagesData.packages.length} packages in collection ${collection}`,
+        );
+
         // Process each package
         for (const pkg of packagesData.packages) {
           if (totalProcessed >= limit) break;
-          
+
           try {
             const processedPackage = await this.processPackage(pkg.packageId);
             console.log(`Successfully processed package ${pkg.packageId}`);
@@ -191,14 +207,16 @@ export class GovInfoIngestion {
             console.error(`Failed to process package ${pkg.packageId}:`, error);
           }
         }
-        
+
         offset += packagesData.packages.length;
-        
+
         // Add a small delay to avoid overwhelming the API
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
-      
-      console.log(`Finished ingesting ${totalProcessed} packages for collection ${collection}`);
+
+      console.log(
+        `Finished ingesting ${totalProcessed} packages for collection ${collection}`,
+      );
     } catch (error) {
       console.error(`Error ingesting collection ${collection}:`, error);
       throw error;
@@ -208,7 +226,7 @@ export class GovInfoIngestion {
   // Ingest data for all configured collections
   async ingestAllCollections(limitPerCollection: number = 1000): Promise<void> {
     console.log("Ingesting data for all configured collections");
-    
+
     for (const collection of this.config.collections) {
       try {
         await this.ingestCollection(collection, limitPerCollection);
@@ -216,7 +234,7 @@ export class GovInfoIngestion {
         console.error(`Failed to ingest collection ${collection}:`, error);
       }
     }
-    
+
     console.log("Finished ingesting all collections");
   }
 }

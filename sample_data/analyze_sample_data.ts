@@ -41,84 +41,97 @@ If any provision of this Act is held invalid, the remainder of the Act shall not
 // Mock analysis functions
 function extractEntities(text) {
   const entities = [];
-  
+
   // Extract person names (simple regex for demo)
   const personMatches = text.match(/\b[A-Z][a-z]+ [A-Z][a-z]+\b/g) || [];
-  personMatches.forEach(name => {
-    if (!entities.find(e => e.text === name)) {
+  personMatches.forEach((name) => {
+    if (!entities.find((e) => e.text === name)) {
       entities.push({
         text: name,
         type: "PERSON",
-        relevance: 0.8
+        relevance: 0.8,
       });
     }
   });
-  
+
   // Extract organizations
-  const orgMatches = text.match(/\b(?:Congress|House|Senate|Committee|Federal|Act|Bill|Law|Regulation)\b/gi) || [];
-  orgMatches.forEach(org => {
-    if (!entities.find(e => e.text === org)) {
+  const orgMatches =
+    text.match(
+      /\b(?:Congress|House|Senate|Committee|Federal|Act|Bill|Law|Regulation)\b/gi,
+    ) || [];
+  orgMatches.forEach((org) => {
+    if (!entities.find((e) => e.text === org)) {
       entities.push({
         text: org,
         type: "ORGANIZATION",
-        relevance: 0.9
+        relevance: 0.9,
       });
     }
   });
-  
+
   // Extract legislation
   const billMatches = text.match(/\b(?:Act|Bill|Law|Regulation)\b/g) || [];
-  billMatches.forEach(bill => {
-    if (!entities.find(e => e.text === bill)) {
+  billMatches.forEach((bill) => {
+    if (!entities.find((e) => e.text === bill)) {
       entities.push({
         text: bill,
         type: "LEGISLATION",
-        relevance: 0.85
+        relevance: 0.85,
       });
     }
   });
-  
+
   return entities;
 }
 
 function analyzeSentiment(text) {
   // Simple sentiment analysis based on keywords
-  const positiveWords = ['protect', 'right', 'security', 'privacy', 'framework', 'comprehensive'];
-  const negativeWords = ['violation', 'penalty', 'fine', 'punishment'];
-  
+  const positiveWords = [
+    "protect",
+    "right",
+    "security",
+    "privacy",
+    "framework",
+    "comprehensive",
+  ];
+  const negativeWords = ["violation", "penalty", "fine", "punishment"];
+
   let positiveScore = 0;
   let negativeScore = 0;
-  
+
   const words = text.toLowerCase().split(/\W+/);
-  
-  words.forEach(word => {
+
+  words.forEach((word) => {
     if (positiveWords.includes(word)) positiveScore++;
     if (negativeWords.includes(word)) negativeScore++;
   });
-  
+
   const total = positiveScore + negativeScore;
   const polarity = total > 0 ? (positiveScore - negativeScore) / total : 0;
-  
+
   return {
     polarity: parseFloat(polarity.toFixed(2)),
-    subjectivity: total > 0 ? Math.min(1, total / 50) : 0.5
+    subjectivity: total > 0 ? Math.min(1, total / 50) : 0.5,
   };
 }
 
 function extractKeyPhrases(text) {
   // Simple key phrase extraction
   const phrases = [];
-  
+
   // Extract noun phrases (simplified)
-  const nounPhrases = text.match(/\b(?:data|privacy|consumer|personal|security|information|framework|rights|obligations|violations|penalties|assessment)\s+(?:[a-z]+){1,2}\b/gi) || [];
-  
+  const nounPhrases =
+    text.match(
+      /\b(?:data|privacy|consumer|personal|security|information|framework|rights|obligations|violations|penalties|assessment)\s+(?:[a-z]+){1,2}\b/gi,
+    ) || [];
+
   // Count occurrences and sort by frequency
   const phraseCounts = {};
-  nounPhrases.forEach(phrase => {
+  nounPhrases.forEach((phrase) => {
     const lowerPhrase = phrase.toLowerCase();
     phraseCounts[lowerPhrase] = (phraseCounts[lowerPhrase] || 0) + 1;
   });
-  
+
   // Convert to array and sort
   Object.entries(phraseCounts)
     .map(([phrase, count]) => ({ phrase, count, score: count / 10 }))
@@ -127,81 +140,95 @@ function extractKeyPhrases(text) {
     .forEach(({ phrase, score }) => {
       phrases.push({
         phrase,
-        score: parseFloat(score.toFixed(2))
+        score: parseFloat(score.toFixed(2)),
       });
     });
-  
+
   return phrases;
 }
 
 function summarizeText(text) {
   // Simple summarization by extracting first and last sentences
-  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-  
+  const sentences = text.split(/[.!?]+/).filter((s) => s.trim().length > 0);
+
   if (sentences.length <= 3) {
     return text;
   }
-  
+
   return `${sentences[0].trim()}. ... ${sentences[sentences.length - 1].trim()}.`;
 }
 
 function analyzeTopics(entities) {
   const topics = [];
-  
+
   // Determine topics based on entities
-  const orgCount = entities.filter(e => e.type === 'ORGANIZATION').length;
-  const personCount = entities.filter(e => e.type === 'PERSON').length;
-  const legislationCount = entities.filter(e => e.type === 'LEGISLATION').length;
-  
+  const orgCount = entities.filter((e) => e.type === "ORGANIZATION").length;
+  const personCount = entities.filter((e) => e.type === "PERSON").length;
+  const legislationCount = entities.filter(
+    (e) => e.type === "LEGISLATION",
+  ).length;
+
   if (orgCount > 0) {
     topics.push({
       topic: "Government",
-      confidence: 0.8
+      confidence: 0.8,
     });
   }
-  
+
   if (legislationCount > 0) {
     topics.push({
       topic: "Legislation",
-      confidence: 0.9
+      confidence: 0.9,
     });
   }
-  
-  if (entities.some(e => e.text.toLowerCase().includes('data') || e.text.toLowerCase().includes('privacy'))) {
+
+  if (
+    entities.some(
+      (e) =>
+        e.text.toLowerCase().includes("data") ||
+        e.text.toLowerCase().includes("privacy"),
+    )
+  ) {
     topics.push({
       topic: "Privacy",
-      confidence: 0.95
+      confidence: 0.95,
     });
   }
-  
-  if (entities.some(e => e.text.toLowerCase().includes('consumer'))) {
+
+  if (entities.some((e) => e.text.toLowerCase().includes("consumer"))) {
     topics.push({
       topic: "Consumer Protection",
-      confidence: 0.9
+      confidence: 0.9,
     });
   }
-  
+
   return topics;
 }
 
 async function analyzeSampleData() {
   console.log("Starting sample data analysis...\n");
-  
+
   try {
     // Extract entities
     console.log("--- Entity Extraction ---");
     const entities = extractEntities(sampleBillText);
     console.log(`Found ${entities.length} entities:`);
     entities.slice(0, 10).forEach((entity, index) => {
-      console.log(`${index + 1}. ${entity.text} (${entity.type}) - Relevance: ${entity.relevance}`);
+      console.log(
+        `${index + 1}. ${entity.text} (${entity.type}) - Relevance: ${entity.relevance}`,
+      );
     });
-    
+
     // Analyze sentiment
     console.log("\n--- Sentiment Analysis ---");
     const sentiment = analyzeSentiment(sampleBillText);
-    console.log(`Polarity: ${sentiment.polarity} (${sentiment.polarity > 0 ? 'Positive' : sentiment.polarity < 0 ? 'Negative' : 'Neutral'})`);
-    console.log(`Subjectivity: ${sentiment.subjectivity} (${sentiment.subjectivity > 0.5 ? 'Subjective' : 'Objective'})`);
-    
+    console.log(
+      `Polarity: ${sentiment.polarity} (${sentiment.polarity > 0 ? "Positive" : sentiment.polarity < 0 ? "Negative" : "Neutral"})`,
+    );
+    console.log(
+      `Subjectivity: ${sentiment.subjectivity} (${sentiment.subjectivity > 0.5 ? "Subjective" : "Objective"})`,
+    );
+
     // Extract key phrases
     console.log("\n--- Key Phrase Extraction ---");
     const keyPhrases = extractKeyPhrases(sampleBillText);
@@ -209,31 +236,36 @@ async function analyzeSampleData() {
     keyPhrases.slice(0, 10).forEach((phrase, index) => {
       console.log(`${index + 1}. ${phrase.phrase} - Score: ${phrase.score}`);
     });
-    
+
     // Summarize text
     console.log("\n--- Text Summarization ---");
     const summary = summarizeText(sampleBillText);
     console.log("Summary:");
     console.log(summary);
-    
+
     // Analyze topics
     console.log("\n--- Topic Analysis ---");
     const topics = analyzeTopics(entities);
     console.log("Identified topics:");
     topics.forEach((topic, index) => {
-      console.log(`${index + 1}. ${topic.topic} - Confidence: ${topic.confidence}`);
+      console.log(
+        `${index + 1}. ${topic.topic} - Confidence: ${topic.confidence}`,
+      );
     });
-    
+
     // Generate insights
     console.log("\n--- Insights ---");
     console.log("1. The bill focuses on data privacy and consumer protection");
-    console.log("2. It establishes a comprehensive framework with specific consumer rights");
+    console.log(
+      "2. It establishes a comprehensive framework with specific consumer rights",
+    );
     console.log("3. Strong emphasis on enforcement with civil penalties");
     console.log("4. Positive sentiment toward consumer protection");
-    console.log("5. Key entities include Congress, data controllers, and consumers");
-    
+    console.log(
+      "5. Key entities include Congress, data controllers, and consumers",
+    );
+
     console.log("\n--- Analysis Complete ---");
-    
   } catch (error) {
     console.error("Error during sample data analysis:", error);
   }

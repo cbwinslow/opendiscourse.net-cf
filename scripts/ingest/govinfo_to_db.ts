@@ -1,20 +1,20 @@
-import { GovInfoIngestion } from '../../ingestion/govinfo/govinfo_ingestion';
-import { Database } from '../../services/database';
-import * as dotenv from 'dotenv';
-import path from 'path';
+import { GovInfoIngestion } from "../../ingestion/govinfo/govinfo_ingestion";
+import { Database } from "../../services/database";
+import * as dotenv from "dotenv";
+import path from "path";
 
 // Load environment variables
-dotenv.config({ path: path.resolve(__dirname, '../../.env.local') });
+dotenv.config({ path: path.resolve(__dirname, "../../.env.local") });
 
 // Configuration
 const config = {
   govinfo: {
-    apiBaseUrl: 'https://api.govinfo.gov',
-    apiKey: process.env.GOVINFO_API_KEY || '',
-    collections: ['BILLS', 'CRPT', 'CREC', 'FR'],
+    apiBaseUrl: "https://api.govinfo.gov",
+    apiKey: process.env.GOVINFO_API_KEY || "",
+    collections: ["BILLS", "CRPT", "CREC", "FR"],
   },
   db: {
-    url: process.env.DATABASE_URL || '',
+    url: process.env.DATABASE_URL || "",
   },
   batchSize: 10, // Number of packages to process in a batch
   maxPackages: 50, // Maximum number of packages to process (for testing)
@@ -22,55 +22,65 @@ const config = {
 
 async function main() {
   try {
-    console.log('Starting govinfo.gov data ingestion...');
-    
+    console.log("Starting govinfo.gov data ingestion...");
+
     // Initialize services
     const govinfo = new GovInfoIngestion({
       apiBaseUrl: config.govinfo.apiBaseUrl,
       apiKey: config.govinfo.apiKey,
       collections: config.govinfo.collections,
     });
-    
+
     const db = new Database(config.db.url);
     await db.connect();
-    
+
     // Process each collection
     for (const collection of config.govinfo.collections) {
       console.log(`\nProcessing collection: ${collection}`);
       await processCollection(govinfo, db, collection);
     }
-    
-    console.log('\nData ingestion completed successfully!');
+
+    console.log("\nData ingestion completed successfully!");
   } catch (error) {
-    console.error('Error during data ingestion:', error);
+    console.error("Error during data ingestion:", error);
     process.exit(1);
   } finally {
     process.exit(0);
   }
 }
 
-async function processCollection(govinfo: GovInfoIngestion, db: Database, collection: string) {
+async function processCollection(
+  govinfo: GovInfoIngestion,
+  db: Database,
+  collection: string,
+) {
   let offset = 0;
   let totalProcessed = 0;
   let hasMore = true;
-  
+
   while (hasMore && totalProcessed < config.maxPackages) {
-    console.log(`\nFetching packages (offset: ${offset}, batch: ${config.batchSize})`);
-    
+    console.log(
+      `\nFetching packages (offset: ${offset}, batch: ${config.batchSize})`,
+    );
+
     // Fetch a batch of packages
-    const response = await govinfo.fetchPackages(collection, offset, config.batchSize);
+    const response = await govinfo.fetchPackages(
+      collection,
+      offset,
+      config.batchSize,
+    );
     const packages = response?.packages || [];
-    
+
     if (!packages.length) {
-      console.log('No more packages to process');
+      console.log("No more packages to process");
       hasMore = false;
       continue;
     }
-    
+
     // Process each package in the batch
     for (const pkg of packages) {
       if (totalProcessed >= config.maxPackages) break;
-      
+
       try {
         console.log(`\nProcessing package: ${pkg.packageId}`);
         await processPackage(govinfo, db, pkg, collection);
@@ -80,23 +90,28 @@ async function processCollection(govinfo: GovInfoIngestion, db: Database, collec
         // Continue with next package on error
       }
     }
-    
+
     // Update offset for next batch
     offset += packages.length;
-    
+
     // Check if we've reached the end
     if (packages.length < config.batchSize) {
       hasMore = false;
     }
   }
-  
+
   console.log(`\nProcessed ${totalProcessed} packages from ${collection}`);
 }
 
-async function processPackage(govinfo: GovInfoIngestion, db: Database, pkg: any, collection: string) {
+async function processPackage(
+  govinfo: GovInfoIngestion,
+  db: Database,
+  pkg: any,
+  collection: string,
+) {
   // Fetch package details
   const details = await govinfo.fetchPackageDetails(pkg.packageId);
-  
+
   // Prepare package data for database
   const packageData = {
     id: pkg.packageId,
@@ -116,18 +131,23 @@ async function processPackage(govinfo: GovInfoIngestion, db: Database, pkg: any,
     previous_link: pkg.previousLink,
     next_link: pkg.nextLink,
   };
-  
+
   // Save package to database
   await db.query(
-    `INSERT INTO govinfo_packages (${Object.keys(packageData).join(', ')})
-     VALUES (${Object.keys(packageData).map((_, i) => `$${i + 1}`).join(', ')})
+    `INSERT INTO govinfo_packages (${Object.keys(packageData).join(", ")})
+     VALUES (${Object.keys(packageData)
+       .map((_, i) => `$${i + 1}`)
+       .join(", ")})
      ON CONFLICT (package_id) DO UPDATE SET
-       ${Object.keys(packageData).filter(k => k !== 'id' && k !== 'package_id').map((k, i) => `${k} = EXCLUDED.${k}`).join(', ')},
+       ${Object.keys(packageData)
+         .filter((k) => k !== "id" && k !== "package_id")
+         .map((k, i) => `${k} = EXCLUDED.${k}`)
+         .join(", ")},
        updated_at = CURRENT_TIMESTAMP
      RETURNING id`,
-    Object.values(packageData)
+    Object.values(packageData),
   );
-  
+
   // Process downloads if any
   if (pkg.downloads?.length) {
     for (const download of pkg.downloads) {
@@ -137,24 +157,28 @@ async function processPackage(govinfo: GovInfoIngestion, db: Database, pkg: any,
          ON CONFLICT (package_id, type) DO UPDATE SET
            url = EXCLUDED.url,
            size = EXCLUDED.size`,
-        [pkg.packageId, download.type, download.url, download.size]
+        [pkg.packageId, download.type, download.url, download.size],
       );
     }
   }
-  
+
   // Process granules if available
   if (pkg.granulesLink) {
     await processGranules(govinfo, db, pkg.packageId);
   }
-  
+
   console.log(`Processed package: ${pkg.packageId}`);
 }
 
-async function processGranules(govinfo: GovInfoIngestion, db: Database, packageId: string) {
+async function processGranules(
+  govinfo: GovInfoIngestion,
+  db: Database,
+  packageId: string,
+) {
   try {
     const response = await govinfo.fetchGranules(packageId);
     const granules = response?.granules || [];
-    
+
     for (const granule of granules) {
       // Save granule to database
       const granuleData = {
@@ -167,16 +191,23 @@ async function processGranules(govinfo: GovInfoIngestion, db: Database, packageI
         category: granule.category,
         chapters_link: granule.chaptersLink,
       };
-      
+
       await db.query(
-        `INSERT INTO govinfo_granules (${Object.keys(granuleData).join(', ')})
-         VALUES (${Object.keys(granuleData).map((_, i) => `$${i + 1}`).join(', ')})
+        `INSERT INTO govinfo_granules (${Object.keys(granuleData).join(", ")})
+         VALUES (${Object.keys(granuleData)
+           .map((_, i) => `$${i + 1}`)
+           .join(", ")})
          ON CONFLICT (id) DO UPDATE SET
-           ${Object.keys(granuleData).filter(k => k !== 'id' && k !== 'package_id' && k !== 'granule_id').map(k => `${k} = EXCLUDED.${k}`).join(', ')},
+           ${Object.keys(granuleData)
+             .filter(
+               (k) => k !== "id" && k !== "package_id" && k !== "granule_id",
+             )
+             .map((k) => `${k} = EXCLUDED.${k}`)
+             .join(", ")},
            updated_at = CURRENT_TIMESTAMP`,
-        Object.values(granuleData)
+        Object.values(granuleData),
       );
-      
+
       // Process downloads if any
       if (granule.downloads?.length) {
         for (const download of granule.downloads) {
@@ -186,11 +217,11 @@ async function processGranules(govinfo: GovInfoIngestion, db: Database, packageI
              ON CONFLICT (granule_id, type) DO UPDATE SET
                url = EXCLUDED.url,
                size = EXCLUDED.size`,
-            [granule.granuleId, download.type, download.url, download.size]
+            [granule.granuleId, download.type, download.url, download.size],
           );
         }
       }
-      
+
       // Process chapters if available
       if (granule.chaptersLink) {
         await processChapters(govinfo, db, granule.granuleId);
@@ -202,11 +233,15 @@ async function processGranules(govinfo: GovInfoIngestion, db: Database, packageI
   }
 }
 
-async function processChapters(govinfo: GovInfoIngestion, db: Database, granuleId: string) {
+async function processChapters(
+  govinfo: GovInfoIngestion,
+  db: Database,
+  granuleId: string,
+) {
   try {
     const response = await govinfo.fetchChapters(granuleId);
     const chapters = response?.chapters || [];
-    
+
     for (const chapter of chapters) {
       // Save chapter to database
       const chapterData = {
@@ -219,16 +254,23 @@ async function processChapters(govinfo: GovInfoIngestion, db: Database, granuleI
         section: chapter.section,
         content: chapter.content,
       };
-      
+
       await db.query(
-        `INSERT INTO govinfo_chapters (${Object.keys(chapterData).join(', ')})
-         VALUES (${Object.keys(chapterData).map((_, i) => `$${i + 1}`).join(', ')})
+        `INSERT INTO govinfo_chapters (${Object.keys(chapterData).join(", ")})
+         VALUES (${Object.keys(chapterData)
+           .map((_, i) => `$${i + 1}`)
+           .join(", ")})
          ON CONFLICT (id) DO UPDATE SET
-           ${Object.keys(chapterData).filter(k => k !== 'id' && k !== 'granule_id' && k !== 'chapter_id').map(k => `${k} = EXCLUDED.${k}`).join(', ')},
+           ${Object.keys(chapterData)
+             .filter(
+               (k) => k !== "id" && k !== "granule_id" && k !== "chapter_id",
+             )
+             .map((k) => `${k} = EXCLUDED.${k}`)
+             .join(", ")},
            updated_at = CURRENT_TIMESTAMP`,
-        Object.values(chapterData)
+        Object.values(chapterData),
       );
-      
+
       // Process downloads if any
       if (chapter.downloads?.length) {
         for (const download of chapter.downloads) {
@@ -238,7 +280,7 @@ async function processChapters(govinfo: GovInfoIngestion, db: Database, granuleI
              ON CONFLICT (chapter_id, type) DO UPDATE SET
                url = EXCLUDED.url,
                size = EXCLUDED.size`,
-            [chapter.chapterId, download.type, download.url, download.size]
+            [chapter.chapterId, download.type, download.url, download.size],
           );
         }
       }

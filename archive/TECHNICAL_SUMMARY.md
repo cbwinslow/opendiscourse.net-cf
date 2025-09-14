@@ -1,11 +1,13 @@
 # OpenDiscourse: Political Document Analyzer - Technical Summary
 
 ## Overview
+
 OpenDiscourse is a comprehensive political document analysis platform built on Cloudflare's powerful suite of services. It leverages Workers, D1, R2, KV, Vectorize, and AI Gateway to provide advanced document management, search, analysis, and RAG (Retrieval Augmented Generation) capabilities.
 
 ## Architecture
 
 ### Core Components
+
 1. **Main Worker** (`src/index.ts`) - Entry point for all API requests
 2. **API Service** (`services/api/api_service.ts`) - Coordinates all services and handles API requests
 3. **Document Service** (`services/documents/document_processor.ts`) - Handles document upload, text extraction, and metadata extraction
@@ -15,6 +17,7 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 7. **Analysis Service** (`services/analysis/analysis_service.ts`) - Provides NLP processing, sentiment analysis, and topic modeling
 
 ### Cloudflare Services Integration
+
 1. **Workers** - Core application logic and API endpoints
 2. **D1** - Structured data storage (documents metadata, user data, analysis results)
 3. **R2** - Object storage for original documents
@@ -25,12 +28,14 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 ## Features Implemented
 
 ### Document Management
+
 - Upload and store political documents (PDF, TXT, DOCX)
 - Automatic metadata extraction (title, author, date, word count)
 - Document versioning and history tracking
 - Document chunking for RAG processing
 
 ### AI-Powered Analysis
+
 - Natural Language Processing for entity extraction (organizations, persons)
 - Sentiment analysis of political content (polarity, subjectivity)
 - Topic modeling and categorization (politics, economy, healthcare, etc.)
@@ -38,18 +43,21 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 - Document summarization
 
 ### Search & Discovery
+
 - Full-text search across all documents
 - Semantic search using vector embeddings
 - Advanced filtering by date, author, topic, sentiment
 - Similar document recommendations
 
 ### RAG (Retrieval Augmented Generation)
+
 - Question answering over political documents
 - Context-aware responses with citations
 - Multi-document synthesis and comparison
 - Fact-checking against known political statements
 
 ### Data Storage & Management
+
 - D1 database with comprehensive schema for documents, metadata, and analysis results
 - R2 storage for original document files
 - KV caching for improved performance
@@ -58,29 +66,35 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 ## API Endpoints
 
 ### Documents
+
 - `POST /api/documents` - Upload document
 - `GET /api/documents` - List documents
 - `GET /api/documents/{id}` - Get document details
 - `DELETE /api/documents/{id}` - Delete document
 
 ### Search
+
 - `GET /api/search?q={query}` - Full-text search
 - `GET /api/search/semantic?q={query}` - Semantic search
 
 ### Analysis
+
 - `POST /api/analyze` - Analyze document
 - `GET /api/analyze/{id}` - Get analysis results
 
 ### RAG
+
 - `POST /api/rag/query` - Ask questions about documents
 - `POST /api/rag/compare` - Compare multiple documents
 
 ### Health
+
 - `GET /api/health` - System health check
 
 ## Database Schema
 
 ### Core Tables
+
 1. **documents** - Main document storage with metadata
 2. **document_metadata** - Extended metadata storage
 3. **entities** - Named entities extracted from documents
@@ -89,12 +103,14 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 6. **users** - User accounts and permissions
 
 ### Search & RAG Tables
+
 1. **search_index** - Full-text search index
 2. **query_log** - Search query analytics
 3. **rag_context_cache** - Cached RAG contexts
 4. **document_chunks** - Document fragments for RAG processing
 
 ### Advanced Features Tables
+
 1. **user_sessions** - Authentication session management
 2. **document_access_logs** - Document access analytics
 3. **document_tags** - Document categorization
@@ -103,6 +119,7 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 6. **api_usage** - API usage tracking
 
 ## Deployment Architecture
+
 1. **Main Worker** for API endpoints
 2. **Scheduled Workers** for background processing
 3. **R2** for document storage
@@ -112,6 +129,7 @@ OpenDiscourse is a comprehensive political document analysis platform built on C
 7. **AI Gateway** for AI model access
 
 ## Future Enhancements
+
 1. **User Authentication** - Add user accounts and access control
 2. **Advanced Visualization** - Interactive charts and graphs
 3. **Real-time Collaboration** - Multi-user document annotation

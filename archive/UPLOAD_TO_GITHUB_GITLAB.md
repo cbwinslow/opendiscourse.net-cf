@@ -16,6 +16,7 @@ Run the setup script which will guide you through the process:
 ```
 
 The script will ask for:
+
 1. Your GitHub username
 2. Your GitHub repository name (create this on GitHub first)
 3. Your GitLab username
@@ -61,12 +62,14 @@ git push -u gitlab main
 ## Verification
 
 After pushing, you should be able to access your repositories at:
+
 - GitHub: https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME
 - GitLab: https://gitlab.com/YOUR_GITLAB_USERNAME/YOUR_REPO_NAME
 
 ## Troubleshooting
 
 If you encounter authentication issues:
+
 1. Make sure you're using the correct URLs
 2. Check that your credentials are correct
 3. Consider using SSH keys for authentication instead of HTTPS

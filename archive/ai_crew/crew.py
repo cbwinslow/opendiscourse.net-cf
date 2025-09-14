@@ -152,7 +152,21 @@ class CodebaseAnalysisCrew:
         return tasks
     
     def kickoff(self) -> Dict[str, Any]:
-        """Run the crew and return results."""
+        """
+        Execute the configured crew workflow, collect and normalize task outputs, persist a JSON summary to repo_path/ai_reviews, and return the results.
+        
+        The function builds a Crew from the instance's agents and tasks, runs it sequentially, and assembles a dictionary containing:
+        - "timestamp": ISO timestamp when the results were collected.
+        - "code_review", "documentation", "quality_assessment", "improvement_proposals": normalized outputs from the corresponding tasks (kept as JSON-serializable objects when possible; non-serializable values are converted to strings).
+        - "raw_result": string representation of the raw Crew kickoff result.
+        
+        Side effects:
+        - Creates (if missing) a directory at <repo_path>/ai_reviews and writes the results to a file named review_<YYYYMMDD_HHMMSS>.json.
+        - Prints the saved file path to stdout.
+        
+        Returns:
+            Dict[str, Any]: The results dictionary described above. On error, returns {"status": "error", "error": "<message>"}.
+        """
         try:
             crew_instance = Crew(
                 agents=list(self.agents.values()),
@@ -163,13 +177,37 @@ class CodebaseAnalysisCrew:
             
             result = crew_instance.kickoff()
             
+            # Helper to ensure values are JSON-serializable
+            def _normalize(value):
+                """
+                Return the input value unchanged if it is JSON-serializable; otherwise return its string representation.
+                
+                The function tests JSON-serializability by attempting json.dumps(value). If serialization succeeds, the original value (e.g., dict, list, number, string) is returned so it can be included in JSON output without alteration. If serialization fails, the function returns str(value) to ensure the caller receives a JSON-encodable fallback.
+                """
+                try:
+                    # If json.dumps succeeds, keep the original object
+                    # (dict/list/etc.).
+                    json.dumps(value)
+                    return value
+                except Exception:
+                    return str(value)
+
             # Prepare results
             results = {
                 "timestamp": datetime.now().isoformat(),
-                "code_review": self.tasks["code_review"].output,
-                "documentation": self.tasks["documentation"].output,
-                "quality_assessment": self.tasks["quality_assurance"].output,
-                "improvement_proposal": self.tasks["improvement_proposal"].output,
+                "code_review": _normalize(
+                    getattr(self.tasks.get("code_review"), "output", None)
+                ),
+                "documentation": _normalize(
+                    getattr(self.tasks.get("documentation"), "output", None)
+                ),
+                "quality_assessment": _normalize(
+                    getattr(self.tasks.get("quality_assurance"), "output", None)
+                ),
+                # task key is 'improvement_proposals' in _create_tasks
+                "improvement_proposals": _normalize(
+                    getattr(self.tasks.get("improvement_proposals"), "output", None)
+                ),
                 "raw_result": str(result)
             }
             
@@ -190,6 +228,8 @@ class CodebaseAnalysisCrew:
             error_msg = f"Error in analysis crew: {str(e)}"
             print(f"\n{error_msg}")
             return {"status": "error", "error": error_msg}
+
+ 
 
 if __name__ == "__main__":
     crew = CodebaseAnalysisCrew(repo_path=".")

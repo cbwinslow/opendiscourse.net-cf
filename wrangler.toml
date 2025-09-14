@@ -62,8 +62,11 @@ max_batch_timeout = 10
 [ai]
 binding = "AI"
 
+<<<<<<< HEAD
 # Build configuration removed - using direct main file
 
+=======
+>>>>>>> b0b10b9 (scaffold infra: terraform skeleton, CI deploy workflows, backup script and docs)
 # Environment overrides
 [env.production]
 name = "opendiscourse-prod"

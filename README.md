@@ -5,7 +5,29 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-4.9.5-blue.svg)](https://www.typescriptlang.org/)
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare%20Workers-F38020?logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
 
-OpenDiscourse is a comprehensive political document analysis platform built on Cloudflare's powerful suite of services. It leverages Workers, D1, R2, KV, Vectorize, and AI Gateway to provide advanced document management, search, analysis, and RAG (Retrieval Augmented Generation) capabilities.
+OpenDiscourse is a comprehensive political document analysis platform built on Cloudflare's powerful suite of services. It leverages<<<<<<< HEAD
+OpenDiscourse represents the future of political document analysis, combining the power of Cloudflare's edge computing with advanced AI techniques to provide unprecedented insights into political discourse.
+
+## Repository Setup
+
+To set up this repository on GitHub and GitLab:
+
+1. **Create repositories** on GitHub and GitLab
+2. **Run the setup script**:
+   ```bash
+   ./setup_remotes.sh
+   ```
+3. **Or manually add remotes**:
+   ```bash
+   git remote add origin https://github.com/your-username/your-repo.git
+   git remote add gitlab https://gitlab.com/your-username/your-repo.git
+   ```
+4. **Push to both repositories**:
+   ```bash
+   git push -u origin main
+   git push -u gitlab main
+
+
 
 ## 🚀 Quick Start
 
@@ -402,11 +424,13 @@ Entities are automatically extracted during document ingestion. You can also man
 ### Setup
 
 1. Install dependencies:
+
    ```bash
    npm install
    ```
 
 2. Login to Cloudflare:
+
    ```bash
    wrangler login
    ```
@@ -416,6 +440,7 @@ Entities are automatically extracted during document ingestion. You can also man
    - For congress.gov: Visit https://congress.gov/api/Documentation
 
 4. Configure API keys:
+
    ```bash
    cp ingestion/config/api_config.json.example ingestion/config/api_config.json
    # Edit the file with your real API keys
@@ -423,16 +448,17 @@ Entities are automatically extracted during document ingestion. You can also man
    ```
 
 5. Create required Cloudflare resources:
+
    ```bash
    # Create D1 database
    wrangler d1 create opendiscourse-db
-   
+
    # Create R2 bucket
    wrangler r2 bucket create opendiscourse-documents
-   
+
    # Create KV namespace
    wrangler kv:namespace create "opendiscourse-cache"
-   
+
    # Create Vectorize index
    wrangler vectorize create opendiscourse-vector-index --dimensions 1024 --metric cosine
    ```
@@ -650,3 +676,5 @@ To set up this repository on GitHub and GitLab:
    ```bash
    git push -u origin main
    git push -u gitlab main
+
+

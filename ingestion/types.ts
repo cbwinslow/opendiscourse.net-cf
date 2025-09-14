@@ -24,7 +24,7 @@ export interface Document {
 export interface QueueItem {
   id: number;
   document_id: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
+  status: "pending" | "processing" | "completed" | "failed";
   error_message?: string;
   retry_count: number;
   created_at: string;
@@ -39,7 +39,7 @@ export interface DocumentProcessor {
       contentType: string;
     },
     metadata?: Record<string, unknown>,
-    source?: string
+    source?: string,
   ): Promise<{ documentId: string; chunks: number }>;
 }
 
@@ -69,12 +69,21 @@ export interface IngestionStats {
 
 // Types for the R1 database client
 export interface R1DatabaseClient {
-  createDocument(document: Omit<Document, 'id' | 'created_at' | 'updated_at' | 'processed'>): Promise<{ id: string }>;
+  createDocument(
+    document: Omit<Document, "id" | "created_at" | "updated_at" | "processed">,
+  ): Promise<{ id: string }>;
   getDocument(id: string): Promise<Document | null>;
   updateDocument(id: string, updates: Partial<Document>): Promise<void>;
   markDocumentAsProcessed(id: string): Promise<void>;
-  insertChunks(params: { documentId: string; chunks: Chunk[]; embeddings: number[][] }): Promise<void>;
-  searchChunks(queryEmbedding: number[], options?: { limit?: number; similarityThreshold?: number }): Promise<VectorSearchResult[]>;
+  insertChunks(params: {
+    documentId: string;
+    chunks: Chunk[];
+    embeddings: number[][];
+  }): Promise<void>;
+  searchChunks(
+    queryEmbedding: number[],
+    options?: { limit?: number; similarityThreshold?: number },
+  ): Promise<VectorSearchResult[]>;
   addToQueue(documentId: string): Promise<void>;
   getNextBatchFromQueue(limit?: number): Promise<QueueItem[]>;
   markQueueItemComplete(id: number): Promise<void>;

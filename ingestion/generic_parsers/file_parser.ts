@@ -41,29 +41,35 @@ export class GenericFileParser {
   }
 
   // Main parsing function that detects file type and parses accordingly
-  static async parseFile(fileBuffer: ArrayBuffer, fileName: string): Promise<string> {
-    const fileExtension = fileName.split('.').pop()?.toLowerCase() || '';
-    
+  static async parseFile(
+    fileBuffer: ArrayBuffer,
+    fileName: string,
+  ): Promise<string> {
+    const fileExtension = fileName.split(".").pop()?.toLowerCase() || "";
+
     // Convert ArrayBuffer to string for text-based files
     const fileContent = new TextDecoder().decode(fileBuffer);
-    
+
     switch (fileExtension) {
-      case 'pdf':
+      case "pdf":
         return this.parsePDF(fileBuffer);
-      case 'xml':
+      case "xml":
         return this.parseXML(fileContent);
-      case 'html':
-      case 'htm':
+      case "html":
+      case "htm":
         return this.parseHTML(fileContent);
-      case 'md':
+      case "md":
         return this.parseMarkdown(fileContent);
-      case 'txt':
+      case "txt":
         return this.parseText(fileContent);
       default:
         // Try to detect file type by content
-        if (fileContent.trim().startsWith('<')) {
+        if (fileContent.trim().startsWith("<")) {
           return this.parseXML(fileContent);
-        } else if (fileContent.trim().startsWith('{') || fileContent.trim().startsWith('[')) {
+        } else if (
+          fileContent.trim().startsWith("{") ||
+          fileContent.trim().startsWith("[")
+        ) {
           return this.parseText(fileContent); // JSON is still text
         } else {
           return this.parseText(fileContent);
@@ -72,17 +78,21 @@ export class GenericFileParser {
   }
 
   // Chunk text into smaller pieces for vectorization
-  static chunkText(text: string, chunkSize: number = 1000, overlap: number = 100): string[] {
+  static chunkText(
+    text: string,
+    chunkSize: number = 1000,
+    overlap: number = 100,
+  ): string[] {
     const chunks: string[] = [];
     const words = text.split(/\s+/);
-    
-    for (let i = 0; i < words.length; i += (chunkSize - overlap)) {
-      const chunk = words.slice(i, i + chunkSize).join(' ');
+
+    for (let i = 0; i < words.length; i += chunkSize - overlap) {
+      const chunk = words.slice(i, i + chunkSize).join(" ");
       if (chunk.trim().length > 0) {
         chunks.push(chunk);
       }
     }
-    
+
     return chunks;
   }
 }

@@ -1,11 +1,13 @@
 # OpenDiscourse Data Ingestion System
 
 ## Overview
+
 The OpenDiscourse data ingestion system is designed to fetch, process, and store data from government sources including govinfo.gov and congress.gov. The system handles various document formats, extracts metadata, chunks documents for vectorization, and stores data in both SQL and vector databases.
 
 ## Architecture
 
 ### Core Components
+
 1. **GovInfo Ingestion Module** - Fetches and processes data from govinfo.gov
 2. **Congress Ingestion Module** - Fetches and processes data from congress.gov
 3. **Generic File Parser** - Handles PDF, XML, HTML, Markdown, and text files
@@ -14,6 +16,7 @@ The OpenDiscourse data ingestion system is designed to fetch, process, and store
 6. **Webhook Receiver** - Handles incoming data from external sources
 
 ### Data Flow
+
 1. **Data Fetching** - API calls to govinfo.gov and congress.gov
 2. **Parsing** - Extract text content from various file formats
 3. **Processing** - Extract metadata and organize data
@@ -24,11 +27,13 @@ The OpenDiscourse data ingestion system is designed to fetch, process, and store
 ## Supported Data Sources
 
 ### GovInfo.gov
+
 - **Collections**: BILLS, CRPT, CREC, FR, GAO, GOVMAN, HMAN, HOMELAND_SECURITY, ERIC, BUDGET, CPD, CPRT, CHRG, CQ, CQAL, LSA, PLAW, STATUTE, USCODE, USCOURTS
 - **Data Types**: Packages, Granules, Chapters
 - **Metadata**: Titles, dates, identifiers, downloads
 
 ### Congress.gov
+
 - **Bills**: Legislative bills with full metadata
 - **Members**: Information about members of Congress
 - **Committees**: Committee structures and memberships
@@ -37,6 +42,7 @@ The OpenDiscourse data ingestion system is designed to fetch, process, and store
 ## File Processing
 
 ### Supported Formats
+
 1. **PDF** - Text extraction from government documents
 2. **XML** - Structured data parsing
 3. **HTML** - Web content extraction
@@ -44,6 +50,7 @@ The OpenDiscourse data ingestion system is designed to fetch, process, and store
 5. **Plain Text** - Raw text files
 
 ### Chunking Strategy
+
 - **Chunk Size**: Configurable (default 1000 words)
 - **Overlap**: Configurable (default 100 words)
 - **Metadata Preservation**: Each chunk retains document metadata
@@ -51,6 +58,7 @@ The OpenDiscourse data ingestion system is designed to fetch, process, and store
 ## Database Schema
 
 ### GovInfo Tables
+
 - `govinfo_packages` - Main document storage
 - `govinfo_package_metadata` - Extended metadata
 - `govinfo_package_identifiers` - Document identifiers
@@ -63,6 +71,7 @@ The OpenDiscourse data ingestion system is designed to fetch, process, and store
 - `govinfo_chapter_downloads` - Chapter downloads
 
 ### Congress Tables
+
 - `congress_bills` - Legislative bills
 - `congress_bill_subjects` - Bill subject categories
 - `congress_bill_summaries` - Bill summaries
@@ -79,20 +88,24 @@ The OpenDiscourse data ingestion system is designed to fetch, process, and store
 ## Webhook System
 
 ### Endpoints
+
 - `/webhook/govinfo` - Receive govinfo.gov updates
 - `/webhook/congress` - Receive congress.gov updates
 
 ### Event Types
+
 - **GovInfo**: package_created, package_updated, package_deleted
 - **Congress**: bill_created, bill_updated, member_updated
 
 ## Configuration
 
 ### API Keys
+
 - GovInfo API key required for govinfo.gov access
 - Congress.gov API key required for congress.gov access
 
 ### Settings
+
 - Chunk size and overlap
 - Batch processing limits
 - Retry policies
@@ -101,6 +114,7 @@ The OpenDiscourse data ingestion system is designed to fetch, process, and store
 ## Usage
 
 ### Command Line Interface
+
 ```bash
 # Ingest govinfo.gov data
 node ingestion.js govinfo
@@ -116,8 +130,9 @@ node ingestion.js all
 ```
 
 ### Programmatic Usage
+
 ```typescript
-import { GovInfoIngestion } from './ingestion/govinfo/govinfo_ingestion';
+import { GovInfoIngestion } from "./ingestion/govinfo/govinfo_ingestion";
 
 const ingestion = new GovInfoIngestion(config);
 await ingestion.ingestAllCollections(1000);
@@ -126,6 +141,7 @@ await ingestion.ingestAllCollections(1000);
 ## Deployment
 
 ### Cloudflare Integration
+
 - **D1**: Structured data storage
 - **R2**: Document storage
 - **Vectorize**: Embedding storage
@@ -133,18 +149,21 @@ await ingestion.ingestAllCollections(1000);
 - **KV**: Caching layer
 
 ### Scheduled Processing
+
 - Use Cloudflare cron triggers for regular data updates
 - Configure webhooks for real-time updates
 
 ## Extensibility
 
 ### Adding New Sources
+
 1. Create a new ingestion module
 2. Define database schema
 3. Implement parsing logic
 4. Add to main ingestion script
 
 ### Custom Processing
+
 1. Extend file parser for new formats
 2. Customize chunking strategy
 3. Implement custom vectorization

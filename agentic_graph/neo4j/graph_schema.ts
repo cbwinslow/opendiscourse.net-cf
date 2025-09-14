@@ -43,9 +43,9 @@ export class GraphSchema {
         "youtubeId",
         "facebookId",
         "createdDate",
-        "lastUpdated"
+        "lastUpdated",
       ],
-      requiredProperties: ["id", "name"]
+      requiredProperties: ["id", "name"],
     },
     {
       label: "Legislation",
@@ -69,9 +69,9 @@ export class GraphSchema {
         "cosponsorsCount",
         "primarySubject",
         "createdAt",
-        "updatedAt"
+        "updatedAt",
       ],
-      requiredProperties: ["id", "billId", "title"]
+      requiredProperties: ["id", "billId", "title"],
     },
     {
       label: "GovernmentBody",
@@ -84,9 +84,9 @@ export class GraphSchema {
         "address",
         "phone",
         "createdDate",
-        "lastUpdated"
+        "lastUpdated",
       ],
-      requiredProperties: ["id", "name"]
+      requiredProperties: ["id", "name"],
     },
     {
       label: "Vote",
@@ -111,9 +111,9 @@ export class GraphSchema {
         "independentYes",
         "independentNo",
         "createdDate",
-        "lastUpdated"
+        "lastUpdated",
       ],
-      requiredProperties: ["id", "voteId", "billId"]
+      requiredProperties: ["id", "voteId", "billId"],
     },
     {
       label: "Action",
@@ -126,9 +126,9 @@ export class GraphSchema {
         "committee",
         "sourceSystem",
         "createdDate",
-        "lastUpdated"
+        "lastUpdated",
       ],
-      requiredProperties: ["id", "actionDate", "text"]
+      requiredProperties: ["id", "actionDate", "text"],
     },
     {
       label: "Statement",
@@ -146,9 +146,9 @@ export class GraphSchema {
         "factCheckScore",
         "hateSpeechScore",
         "createdDate",
-        "lastUpdated"
+        "lastUpdated",
       ],
-      requiredProperties: ["id", "speakerId", "text", "date"]
+      requiredProperties: ["id", "speakerId", "text", "date"],
     },
     {
       label: "MediaAppearance",
@@ -164,9 +164,9 @@ export class GraphSchema {
         "duration",
         "topics",
         "createdDate",
-        "lastUpdated"
+        "lastUpdated",
       ],
-      requiredProperties: ["id", "speakerId", "title", "date"]
+      requiredProperties: ["id", "speakerId", "title", "date"],
     },
     {
       label: "SocialMediaPost",
@@ -186,22 +186,15 @@ export class GraphSchema {
         "biasScore",
         "hateSpeechScore",
         "createdDate",
-        "lastUpdated"
+        "lastUpdated",
       ],
-      requiredProperties: ["id", "postId", "platform", "speakerId", "text"]
+      requiredProperties: ["id", "postId", "platform", "speakerId", "text"],
     },
     {
       label: "Organization",
-      properties: [
-        "id",
-        "name",
-        "type",
-        "url",
-        "createdDate",
-        "lastUpdated"
-      ],
-      requiredProperties: ["id", "name"]
-    }
+      properties: ["id", "name", "type", "url", "createdDate", "lastUpdated"],
+      requiredProperties: ["id", "name"],
+    },
   ];
 
   static readonly RELATIONSHIPS: GraphRelationship[] = [
@@ -209,96 +202,96 @@ export class GraphSchema {
       type: "MEMBER_OF",
       from: "Politician",
       to: "GovernmentBody",
-      properties: ["startDate", "endDate", "role", "party", "createdDate"]
+      properties: ["startDate", "endDate", "role", "party", "createdDate"],
     },
     {
       type: "SPONSORS",
       from: "Politician",
       to: "Legislation",
-      properties: ["date", "isPrimary", "createdDate"]
+      properties: ["date", "isPrimary", "createdDate"],
     },
     {
       type: "VOTES_ON",
       from: "Politician",
       to: "Vote",
-      properties: ["vote", "createdDate"]
+      properties: ["vote", "createdDate"],
     },
     {
       type: "AUTHORS",
       from: "Politician",
       to: "Statement",
-      properties: ["date", "createdDate"]
+      properties: ["date", "createdDate"],
     },
     {
       type: "MAKES",
       from: "Politician",
       to: "Statement",
-      properties: ["date", "createdDate"]
+      properties: ["date", "createdDate"],
     },
     {
       type: "APPEARS_IN",
       from: "Politician",
       to: "MediaAppearance",
-      properties: ["date", "createdDate"]
+      properties: ["date", "createdDate"],
     },
     {
       type: "POSTS",
       from: "Politician",
       to: "SocialMediaPost",
-      properties: ["date", "createdDate"]
+      properties: ["date", "createdDate"],
     },
     {
       type: "AFFILIATED_WITH",
       from: "Politician",
       to: "Organization",
-      properties: ["startDate", "endDate", "role", "createdDate"]
+      properties: ["startDate", "endDate", "role", "createdDate"],
     },
     {
       type: "OPPOSES",
       from: "Politician",
       to: "Legislation",
-      properties: ["date", "reason", "createdDate"]
+      properties: ["date", "reason", "createdDate"],
     },
     {
       type: "SUPPORTS",
       from: "Politician",
       to: "Legislation",
-      properties: ["date", "reason", "createdDate"]
+      properties: ["date", "reason", "createdDate"],
     },
     {
       type: "DECLARED_IN",
       from: "Action",
       to: "Legislation",
-      properties: ["date", "createdDate"]
+      properties: ["date", "createdDate"],
     },
     {
       type: "AFFECTS",
       from: "Legislation",
       to: "Politician",
-      properties: ["provision", "createdDate"]
+      properties: ["provision", "createdDate"],
     },
     {
       type: "REFERENCES",
       from: "Legislation",
       to: "Legislation",
-      properties: ["type", "createdDate"]
+      properties: ["type", "createdDate"],
     },
     {
       type: "RELATED_TO",
       from: "Legislation",
       to: "Legislation",
-      properties: ["type", "createdDate"]
-    }
+      properties: ["type", "createdDate"],
+    },
   ];
 
   // Get node definition by label
   static getNodeByLabel(label: string): GraphNode | undefined {
-    return this.NODES.find(node => node.label === label);
+    return this.NODES.find((node) => node.label === label);
   }
 
   // Get relationship definition by type
   static getRelationshipByType(type: string): GraphRelationship | undefined {
-    return this.RELATIONSHIPS.find(rel => rel.type === type);
+    return this.RELATIONSHIPS.find((rel) => rel.type === type);
   }
 
   // Validate node properties
@@ -309,7 +302,9 @@ export class GraphSchema {
     // Check required properties
     for (const requiredProp of nodeDef.requiredProperties) {
       if (!(requiredProp in properties)) {
-        console.error(`Missing required property '${requiredProp}' for node type '${label}'`);
+        console.error(
+          `Missing required property '${requiredProp}' for node type '${label}'`,
+        );
         return false;
       }
     }
@@ -318,7 +313,10 @@ export class GraphSchema {
   }
 
   // Validate relationship properties
-  static validateRelationship(type: string, properties: Record<string, any>): boolean {
+  static validateRelationship(
+    type: string,
+    properties: Record<string, any>,
+  ): boolean {
     const relDef = this.getRelationshipByType(type);
     if (!relDef) return false;
 
